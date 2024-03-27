@@ -1,16 +1,30 @@
 #!/bin/bash
 
+echo "Which entries would you like to read?   ex)1, 2, 5   (Leave blank for last entry)"
+read ENTRY_NUMS
+
+
+
 MYSQL_HOST="localhost"
 MYSQL_USER="root"
 MYSQL_DATABASE="blog_entries"
 
-SQL="	
-SELECT entry
-FROM entries
-WHERE entry_number = (
-	SELECT MAX(entry_number)
-	FROM entries
-	);"
+if [ "$ENTRY_NUMS" == "" ]; then
+	SQL="	
+		SELECT *
+		FROM entries
+		WHERE entry_number = (
+			SELECT MAX(entry_number)
+			FROM entries
+			);
+	"
+else
+	SQL="
+		SELECT *
+		FROM entries
+		WHERE entry_number IN ("$ENTRY_NUMS");
+	"
+fi
 
 mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$SQL" | grep -v '^[-]*$' > output_dirty
 
