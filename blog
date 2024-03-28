@@ -1,12 +1,11 @@
 #!/bin/bash
 
-source "read.sh"
-source "write.sh"
-source "edit.sh"
-source "delete.sh"
-source "backup.sh"
-source "publish.sh"
-
+source "/usr/local/bin/blog_read"
+source "/usr/local/bin/blog_write"
+source "/usr/local/bin/blog_edit"
+source "/usr/local/bin/blog_delete"
+source "/usr/local/bin/blog_backup"
+source "./publish"
 
 MYSQL_HOST="localhost"
 MYSQL_USER="root"
@@ -20,7 +19,8 @@ if [ $# -eq 0 ]; then
 	blog edit 
 	blog delete 
 	blog backup
-	blog publish"
+	blog publish
+	"
 elif [ $1 == "read" ]; then
 	blog_read "$2"
 elif [ $1 == "write" ]; then
@@ -40,5 +40,6 @@ else
         blog edit
         blog delete
         blog backup
-        blog publish"
+	blog publish
+  	"
 fi

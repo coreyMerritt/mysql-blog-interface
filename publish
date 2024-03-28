@@ -1,0 +1,13 @@
+#!/bin/bash
+
+function publish_tools() {
+	
+		cp read /usr/local/bin/blog_read.sh
+		cp write /usr/local/bin/blog_write.sh
+		cp edit /usr/local/bin/blog_edit.sh
+		cp delete /usr/local/bin/blog_delete.sh
+		cp backup /usr/local/bin/blog_backup.sh
+		cp publish /usr/local/bin/blog_publish.sh
+		cp blog /usr/local/bin/blog
+
+}
