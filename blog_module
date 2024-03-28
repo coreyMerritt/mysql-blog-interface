@@ -24,7 +24,6 @@ function clean_output() {
 
 
 function show_output() {
-	clean_output
 	vim -c ":set wrap linebreak" output
 }
 
@@ -122,24 +121,31 @@ function execute_mysql() {
 function blog_read() {
 
         if [ "$1" == "" ]; then
-                echo -e "Which entries would you like to read?:\n\tex) 7\n\tex) 1, 2, 5\n\tex) last\n\tex) all"
+                echo -e "Which entries would you like to read?\n\tex) 7\n\tex) 1, 2, 5\n\tex) last\n\tex) all"
                 read read_nums
         else
                 read_nums="$1"
         fi
 
 
-        action=$(sql "read" "$read_nums")
-
+        action=$(sql "read" "$read_nums" 2>/dev/null) 
+		
         execute_mysql "$action"
-
+	
         if [ $? -eq 0 ]; then
                 echo "Read successful."
+		clean_output
 		show_output
                 exit 0
         else
-                echo "Something went wrong."
-                exit 1
+		clean_output
+		if [ "$(<output)" == "" ]; then
+                	echo "That entry doesn't exist."
+                	exit 1
+		else
+               	echo "Something went wrong."
+                	exit 1
+		fi
         fi
 }
 
@@ -156,7 +162,7 @@ function blog_write() {
 
         action=$(sql "write" "$ENTRY_FILE")
 
-        execute_mysql "$action"
+        execute_mysql "$action" 
 
         if [ $? -eq 0 ]; then
                 echo "Write successful."
@@ -165,6 +171,7 @@ function blog_write() {
                 read read_ans
 
                 if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
+			clean_output
                         show_output
                         exit 0
                 else
@@ -181,7 +188,7 @@ function blog_write() {
 function blog_edit() {
 
         if [ "$1" == "" ]; then
-                echo -e "Which entry would you like to overwrite?:\n\tex) 7\n\tex)last"
+                echo -e "Which entry would you like to overwrite?\n\tex) 7\n\tex)last"
                 read edit_num
         else
                 edit_num="$1"
@@ -198,7 +205,7 @@ function blog_edit() {
 	
 	action=$(sql "edit" "$editnum" "$ENTRY_FILE")
 
-        echo "Are you sure you want to permanently overwrite this entry?: (Y/N)"
+        echo "Are you sure you want to permanently overwrite this entry? (Y/N)"
         read edit_ans
 
         if [ $edit_ans == "Y" ] || [ $edit_ans == "y" ]; then
@@ -207,10 +214,11 @@ function blog_edit() {
 
                 if [ $? -eq 0 ]; then
 			echo "Edit successful."
-                        echo "Read all entries?: (Y/N)"
+                        echo "Read all entries? (Y/N)"
                         read read_ans
 
                         if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
+				clean_output
                                 show_output
                                 exit 0
                         else
@@ -231,7 +239,7 @@ function blog_edit() {
 function blog_delete() {
 
         if [ "$1" == "" ]; then
-                echo -e "Which entries would you like to delete?:\n\tex) 7\n\tex) 1, 2, 5\n\tex) last"
+                echo -e "Which entries would you like to delete?\n\tex) 7\n\tex) 1, 2, 5\n\tex) last"
                 read del_nums
         else
                 del_nums="$1"
@@ -240,7 +248,7 @@ function blog_delete() {
 
         action=$(sql "delete" "$del_nums")
   
-        echo "Are you sure you want to permanently delete these entries?: (Y/N)"
+        echo "Are you sure you want to permanently delete these entries? (Y/N)"
         read del_ans
 
         if [ $del_ans == "Y" ] || [ $del_ans == "y" ]; then
@@ -250,10 +258,11 @@ function blog_delete() {
                 if [ $? -eq 0 ]; then
 
 			echo "Deletion completed."
-                        echo "Read all entries?: (Y/N)"
+                        echo "Read all entries? (Y/N)"
                         read read_ans
 
                         if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
+				clean_output
                                 show_output
                                 exit 0
                         else
