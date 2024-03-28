@@ -1,14 +1,8 @@
 #!/bin/bash
 
-<<COMMENT
-MYSQL_HOST="localhost"
-MYSQL_USER="root"
-MYSQL_DATABASE="blog_entries"
-COMMENT
-
 function blog_read() {
 	
-	if [ $# -ne 0 ]; then
+	if [ $1 != "" ]; then
 
 		if [ "$1" == "all" ]; then
 			SQL="
