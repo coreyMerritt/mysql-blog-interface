@@ -3,10 +3,10 @@
 function blog_edit() {
 
 	if [ "$1" == "" ]; then
-		echo "Which entry would you like to overwrite?:"
-		read OVERWRITE_NUM
+		echo -e "Which entry would you like to overwrite?:\nex) 7\nex)last"
+		read OVR_NUM
 	else
-		OVERWRITE_NUM="$1"
+		OVR_NUM="$1"
 	fi
 
 
@@ -24,16 +24,33 @@ function blog_edit() {
 
 	ENTRY=$(<entry_dirty)
 	rm entry_dirty
-
-	SQL="
-		UPDATE entries
-		SET entry = CONCAT('$ENTRY')
-		WHERE (entry_number = $OVERWRITE_NUM);
 	
-		SELECT *
-                FROM entries
-                WHERE entry_number = $OVERWRITE_NUM;
+	
+	if [ "$OVR_NUM" == "last" ]; then
+                SQL="
+                	UPDATE entries
+               		SET entry = CONCAT('$ENTRY')
+               		WHERE entry_number = (
+                                SELECT MAX(entry_number)
+                                FROM entries
+                                );
+
+                	SELECT *
+                	FROM entries
+                	WHERE entry_number = $OVERWRITE_NUM;
+                "
+        else
+		SQL="
+			UPDATE entries
+			SET entry = CONCAT('$ENTRY')
+			WHERE (entry_number = $OVERWRITE_NUM);
+	
+			SELECT *
+                	FROM entries
+                	WHERE entry_number = $OVERWRITE_NUM;
 	"
+	fi
+	
 
 	echo "Are you sure you want to permanently overwrite this entry?: (Y/N)"
 	read EDIT_ANS

@@ -5,7 +5,7 @@ source blog_prompts
 function blog_read() {
 	
         if [ "$1" == "" ]; then
-                echo -e $READ_INIT
+                echo -e "Which entries would you like to read?:\nex) 7\nex) 1, 2, 5\nex) last\nex)all"
                 read READ_NUMS
         else
                 READ_NUMS="$1"

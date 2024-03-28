@@ -12,9 +12,7 @@ function publish_tools() {
 	cp prompts /usr/local/bin/blog_prompts
 	
 	if [ $? -eq 0 ]; then
-		echo "Publish to /usr/local/bin successful. 
-		You may now run commands using:
-		blog ..."
+		echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\nblog ..."
 		exit 0
 	else
 		echo "Something went wrong."
