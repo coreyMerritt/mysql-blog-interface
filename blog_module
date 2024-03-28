@@ -1,12 +1,15 @@
 #!/bin/bash
 
 function prep_entry() {
+	# Moves the entry to a temporary file to be formatted.
 	cp "$1" entry_dirty
 
+	# Formats the entry file such that it won't conflict with SQL commands and can be reversed upon retrieval.
         sed -i "s/'/', CHAR(39), '/g" entry_dirty
         sed -i "s/\"/', CHAR(34), '/g" entry_dirty
         sed -i "s/;/', CHAR(59), '/g" entry_dirty
 
+	# Returns formatted text and cleans up temp file.
 	ENTRY_FILE=$(<entry_dirty)
         rm entry_dirty
 	echo "$ENTRY_FILE"
@@ -14,10 +17,14 @@ function prep_entry() {
 
 
 function clean_output() {
-        sed -i 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g' output_dirty
+        # Reverse engineers some of the escape sequences that MySQL outputs.
         sed -i 's/\\t/\t/g' output_dirty
         sed -i 's/\\n/\n/g' output_dirty
 
+	# Additional formatting to make things more digestable in a lightweight text editor.
+	sed -i 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g' output_dirty
+
+	# Moves the output to a long-term file once it's formatted and removes the temp one.
         cp output_dirty output
         rm output_dirty
 } 
@@ -29,6 +36,7 @@ function show_output() {
 
 
 function sql() {
+	# Read Branch
 	if [ $1 == "read" ]; then
 		if [ $2 == "all" ]; then
 			
@@ -52,6 +60,7 @@ function sql() {
                 	"
 	
 		fi
+	# Write Branch
 	elif [ $1 == "write" ]; then 
 	
 		echo "INSERT INTO entries (entry) VALUES (
@@ -65,6 +74,7 @@ function sql() {
                         	FROM entries
                         	);"
 	
+	# Edit Branch
 	elif [ $1 == "edit" ]; then
 		if [ $2 == "last" ]; then
 	
@@ -88,6 +98,7 @@ function sql() {
                         	FROM entries;"
 
 		fi
+	# Delete Branch
 	elif [ $1 == "delete" ]; then
 		if [ $2 == "last" ]; then
 
@@ -114,12 +125,13 @@ function sql() {
 
 
 function execute_mysql() {
+	# Enters the DBMS, submits the query, and returns the data to a file "output_dirty."
 	mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$1" | grep -v '^[-]*$' > output_dirty
 }
 
 
 function blog_read() {
-
+	# Asks the user what they want to read if it wasn't specified in args.
         if [ "$1" == "" ]; then
                 echo -e "Which entries would you like to read?\n\tex) 7\n\tex) 1, 2, 5\n\tex) last\n\tex) all"
                 read read_nums
@@ -127,11 +139,11 @@ function blog_read() {
                 read_nums="$1"
         fi
 
-
+	# Gets our query based on user input/args and executes.
         action=$(sql "read" "$read_nums" 2>/dev/null) 
-		
         execute_mysql "$action"
 	
+	# Determines success and reports. Shows user their result if possible.
         if [ $? -eq 0 ]; then
                 echo "Read successful."
 		clean_output
@@ -143,7 +155,7 @@ function blog_read() {
                 	echo "That entry doesn't exist."
                 	exit 1
 		else
-               	echo "Something went wrong."
+               		echo "Something went wrong."
                 	exit 1
 		fi
         fi
@@ -151,19 +163,21 @@ function blog_read() {
 
 
 function blog_write() {
-
+	# If file was specified in args, we use that. If not, we use "entry."
         if [ "$1" == "" ]; then
                 file_name="./entry"
         else
                 file_name="$1"
         fi
 
+	
+	# Prep entry file by formatting for MySQL, determine SQL to be used, and execute.
         ENTRY_FILE=$(prep_entry "$file_name")
-
         action=$(sql "write" "$ENTRY_FILE")
-
         execute_mysql "$action" 
 
+
+	# Report results to the user, show a finalized version of their write if requested.
         if [ $? -eq 0 ]; then
                 echo "Write successful."
 
@@ -181,12 +195,11 @@ function blog_write() {
                 echo "Something went wrong."
                 exit 1
         fi
-
 }
 
 
 function blog_edit() {
-
+	# Asks the user what they want to edit if it wasn't specified in args.
         if [ "$1" == "" ]; then
                 echo -e "Which entry would you like to overwrite?\n\tex) 7\n\tex)last"
                 read edit_num
@@ -195,23 +208,24 @@ function blog_edit() {
         fi
 
 
+	# If file was specified in args, we use that. If not, we use "entry."
         if [ "$2" == "" ]; then
                 file_name="./entry"
         else
                 file_name="$2"
         fi
 
+	# Prep entry file by formatting for MySQL and determine SQL to be used.
         ENTRY_FILE=$(prep_entry "$file_name")
-	
 	action=$(sql "edit" "$editnum" "$ENTRY_FILE")
 
+	# Warns the user.
         echo "Are you sure you want to permanently overwrite this entry? (Y/N)"
         read edit_ans
 
+	# Executes the SQL in the DBMS, report results to user, display all entries if requested.
         if [ $edit_ans == "Y" ] || [ $edit_ans == "y" ]; then
-
                 execute_mysql "$action"
-
                 if [ $? -eq 0 ]; then
 			echo "Edit successful."
                         echo "Read all entries? (Y/N)"
@@ -232,12 +246,11 @@ function blog_edit() {
                 echo "Nothing has been overwritten."
                 exit 0
         fi
-
 }
 
 
 function blog_delete() {
-
+	# Asks the user what they want to edit if it wasn't specified in args.
         if [ "$1" == "" ]; then
                 echo -e "Which entries would you like to delete?\n\tex) 7\n\tex) 1, 2, 5\n\tex) last"
                 read del_nums
@@ -246,21 +259,20 @@ function blog_delete() {
         fi
 
 
+	# Determines SQL to be used.
         action=$(sql "delete" "$del_nums" 2>/dev/null)
   
+	# Warns the user.
         echo "Are you sure you want to permanently delete these entries? (Y/N)"
         read del_ans
 
+	# Deletes desired entries if confirmed and gives the user the option to view all entries to confirm.
         if [ $del_ans == "Y" ] || [ $del_ans == "y" ]; then
-
                 execute_mysql "$action"
-
                 if [ $? -eq 0 ]; then
-
 			echo "Deletion completed."
                         echo "Read all entries? (Y/N)"
                         read read_ans
-
                         if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
 				clean_output
                                 show_output
@@ -276,34 +288,32 @@ function blog_delete() {
                 echo "Nothing has been deleted."
                 exit 0
         fi
-
 }
 
 
 
 function blog_backup() {
-
+	# Gets a snapshot of the backup before and after trying to overwrite it.	
         BEFORE_DUMP=$(<backup.sql)
-
         mysqldump -u root -p blog_entries > backup.sql
-
         AFTER_DUMP=$(<backup.sql)
 
+	# Checks if the snapshots are different to determine success.
         if [ "$BEFORE_DUMP" != "$AFTER_DUMP" ]; then
                 echo "Backup Successful."
                 exit 0
         else
                 echo "Something went wrong. Your backup was not updated."
         fi
-
 }
 
 
 function publish_tools() {
-
+	# Moves necessary files to a $PATH directory for ease of access.
         cp blog_module /usr/local/bin/blog_module
         cp blog /usr/local/bin/blog
 
+	# Report results to user.
         if [ $? -eq 0 ]; then
                 echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\n\tblog ..."
                 exit 0
@@ -311,5 +321,4 @@ function publish_tools() {
                 echo "Something went wrong."
                 exit 1
         fi
-
 }

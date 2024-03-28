@@ -1,17 +1,13 @@
 #!/bin/bash
 
-source "/usr/local/bin/blog_read"
-source "/usr/local/bin/blog_write"
-source "/usr/local/bin/blog_edit"
-source "/usr/local/bin/blog_delete"
-source "/usr/local/bin/blog_backup"
-source "./publish"
+source "/usr/local/bin/blog_module"
 
+# MySQL Constants.
 MYSQL_HOST="localhost"
 MYSQL_USER="root"
 MYSQL_DATABASE="blog_entries"
 
-
+# Checks if entered action is valid, if not returns a helpful error.
 if [ $# -eq 0 ]; then
 	echo -e "An argument is mandatory, please run again with one of the following:\n\tblog read\n\tblog write\n\tblog edit\n\tblog delete\n\tblog backup\n\tblog publish"
 	exit 1
