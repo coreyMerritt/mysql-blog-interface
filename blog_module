@@ -9,7 +9,7 @@ function prep_entry() {
 
 	ENTRY_FILE=$(<entry_dirty)
         rm entry_dirty
-	return "$ENTRY_FILE"
+	echo "$ENTRY_FILE"
 }
 
 
