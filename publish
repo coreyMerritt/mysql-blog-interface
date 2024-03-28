@@ -9,7 +9,6 @@ function publish_tools() {
 	cp backup /usr/local/bin/blog_backup
 	cp publish /usr/local/bin/blog_publish
 	cp blog /usr/local/bin/blog
-	cp prompts /usr/local/bin/blog_prompts
 	
 	if [ $? -eq 0 ]; then
 		echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\nblog ..."
