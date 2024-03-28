@@ -6,7 +6,8 @@ MYSQL_USER="root"
 MYSQL_DATABASE="blog_entries"
 COMMENT
 
-function read(selection) {
+function blog_read() {
+	
 	if [ $# -ne 0 ]; then
 
 		if [ "$1" == "all" ]; then

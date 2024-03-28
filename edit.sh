@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function edit() {
+function blog_edit() {
 
 	echo "Which entry would you like to overwrite?:"
 	read OVERWRITE_NUM
@@ -47,3 +47,5 @@ elif [ "$READ_ANS" == "N" ] || [ "$READ_ANS" == "n" ]; then
 	exit 1
 fi
 COMMENT
+
+}

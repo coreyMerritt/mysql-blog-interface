@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function write() {
+function blog_write() {
 
 	cp entry entry_mysql
 
@@ -31,3 +31,4 @@ COMMENT
 	elif [ "$READ_ANS" == "N" ] || [ "$READ_ANS" == "n" ]; then
 		exit 1
 	fi
+}

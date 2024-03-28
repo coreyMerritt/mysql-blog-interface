@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function backup() {
+function blog_backup() {
 
 	mysqldump -u root -p blog_entries > blog_entries.sql
 

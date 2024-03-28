@@ -1,6 +1,6 @@
 #!/bin/bash
 
-function delete() {
+function blog_delete() {
 
 	echo "Which entries would you like to delete? ex)1, 2, 5"
 	read DEL_NUMS
