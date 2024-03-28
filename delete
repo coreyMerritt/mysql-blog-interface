@@ -3,7 +3,7 @@
 function blog_delete() {
 
 	if [ "$1" == "" ]; then
-                echo -e "Which entries would you like to delete?:\nex) 7\nex) 1, 2, 5\nex) last"
+                echo -e "Which entries would you like to delete?:\n\tex) 7\n\tex) 1, 2, 5\n\tex) last"
                 read DEL_NUMS
         else
                 DEL_NUMS="$1"

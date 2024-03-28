@@ -11,7 +11,7 @@ function publish_tools() {
 	cp blog /usr/local/bin/blog
 	
 	if [ $? -eq 0 ]; then
-		echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\nblog ..."
+		echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\n\tblog ..."
 		exit 0
 	else
 		echo "Something went wrong."

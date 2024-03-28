@@ -3,7 +3,7 @@
 function blog_read() {
 	
         if [ "$1" == "" ]; then
-                echo -e "Which entries would you like to read?:\nex) 7\nex) 1, 2, 5\nex) last\nex)all"
+                echo -e "Which entries would you like to read?:\n\tex) 7\n\tex) 1, 2, 5\n\tex) last\n\tex)all"
                 read READ_NUMS
         else
                 READ_NUMS="$1"

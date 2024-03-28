@@ -13,14 +13,7 @@ MYSQL_DATABASE="blog_entries"
 
 
 if [ $# -eq 0 ]; then
-	echo "An argument is mandatory, please run again with one of the following: 
-	blog read
-	blog write
-	blog edit 
-	blog delete 
-	blog backup
-	blog publish
-	"
+	echo -e "An argument is mandatory, please run again with one of the following:\n\tblog read\n\tblog write\n\tblog edit\n\tblog delete\n\tblog backup\n\tblog publish"
 	exit 1
 elif [ $1 == "read" ]; then
 	blog_read "$2"
@@ -35,13 +28,6 @@ elif [ $1 == "backup" ]; then
 elif [ $1 == "publish" ]; then
 	publish_tools "$2"
 else
-	echo -e "You've entered an invalid argument, please run again with one of the following:
-        blog read
-        blog write
-        blog edit
-        blog delete
-        blog backup
-	blog publish
-  	"
+	echo -e "You've entered an invalid argument, please run again with one of the following:\n\tblog read\n\tblog write\n\tblog edit\n\tblog delete\n\tblog backup\n\tblog publish"
 	exit 1
 fi

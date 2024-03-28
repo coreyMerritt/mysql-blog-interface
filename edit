@@ -3,7 +3,7 @@
 function blog_edit() {
 
 	if [ "$1" == "" ]; then
-		echo -e "Which entry would you like to overwrite?:\nex) 7\nex)last"
+		echo -e "Which entry would you like to overwrite?:\n\tex) 7\n\tex)last"
 		read OVR_NUM
 	else
 		OVR_NUM="$1"
