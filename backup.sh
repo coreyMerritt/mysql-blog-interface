@@ -11,7 +11,7 @@ function blog_backup() {
 	if [ "$before_dump" != "$after_dump" ]; then
 		echo "Backup Successful."
 	else
-		echo "blog_entries.sql was not updated, something went wrong."
+		echo "Your backup was not updated, something went wrong."
 	fi
 
 }
