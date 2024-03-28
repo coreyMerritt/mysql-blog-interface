@@ -246,7 +246,7 @@ function blog_delete() {
         fi
 
 
-        action=$(sql "delete" "$del_nums")
+        action=$(sql "delete" "$del_nums" 2>/dev/null)
   
         echo "Are you sure you want to permanently delete these entries? (Y/N)"
         read del_ans
