@@ -21,6 +21,7 @@ if [ $# -eq 0 ]; then
 	blog backup
 	blog publish
 	"
+	exit 1
 elif [ $1 == "read" ]; then
 	blog_read "$2"
 elif [ $1 == "write" ]; then
@@ -42,4 +43,5 @@ else
         blog backup
 	blog publish
   	"
+	exit 1
 fi

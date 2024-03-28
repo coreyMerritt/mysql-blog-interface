@@ -10,8 +10,9 @@ function blog_backup() {
 
 	if [ "$before_dump" != "$after_dump" ]; then
 		echo "Backup Successful."
+		exit 0
 	else
-		echo "Your backup was not updated, something went wrong."
+		echo "Something went wrong. Your backup was not updated."
 	fi
 
 }

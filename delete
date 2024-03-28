@@ -3,19 +3,37 @@
 function blog_delete() {
 
 	if [ "$1" == "" ]; then
-                echo "Which entry would you like to delete?:   ex)1, 2, 5"
+                echo "Which entries would you like to delete?:
+ex) 7
+ex) 1, 2, 5
+ex) last"
                 read DEL_NUMS
         else
                 DEL_NUMS="$1"
         fi
 
-	SQL="
-		DELETE FROM entries
-		WHERE entry_number IN ($DEL_NUMS);
+	
+	if [ "$DEL_NUMS" == "last" ]; then
+		SQL="
+                	DELETE FROM entries
+                	WHERE entry_number = (
+                                SELECT MAX(entry_number)
+                                FROM entries
+                                );
 
-                SELECT *
-                FROM entries; 
-	"
+                	SELECT *
+                	FROM entries;
+        	"
+	else
+		SQL="
+                        DELETE FROM entries
+                        WHERE entry_number IN ("$DEL_NUMS");
+
+                        SELECT *
+                        FROM entries;
+                "
+	fi
+
 
 	echo "Are you sure you want to permanently delete these entries?: (Y/N)"
 	read DEL_ANS
@@ -46,10 +64,11 @@ function blog_delete() {
                                 exit 0
                         fi
                 else
-                        echo "Nothing has been deleted."
+                        echo "Something went wrong. Nothing has been deleted."
                         exit 1
                 fi
 	else	
+		echo "Something went wrong. Nothing has been deleted."
 		exit 1
 	fi
 

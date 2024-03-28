@@ -9,6 +9,7 @@ function blog_edit() {
 		OVERWRITE_NUM="$1"
 	fi
 
+
 	if [ "$2" == "" ]; then
                 file_name="./entry"
         else
@@ -56,17 +57,18 @@ function blog_edit() {
         		if [ "$READ_ANS" == "Y" ] || [ "$READ_ANS" == "y" ]; then
                 		vim output
 				echo "Overwrite completed."
+				exit 0
         		else
 				echo "Overwrite completed."
             	   		exit 0
 			fi
 		else
-                	echo "Nothing has been overwritten."
+                	echo "Something went wrong. Nothing has been overwritten."
 			exit 1
 		fi
 	else
 		echo "Nothing has been overwritten."
-                        exit 0
+              	exit 0
 	fi
 
 }
