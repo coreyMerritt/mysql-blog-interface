@@ -2,13 +2,13 @@
 
 function blog_backup() {
 	
-	before_dump=$(<blog_entries.sql)
+	BEFORE_DUMP=$(<backup.sql)
 	
-	mysqldump -u root -p blog_entries > blog_entries.sql
+	mysqldump -u root -p blog_entries > backup.sql
 
-	after_dump=$(<blog_entries.sql)
+	AFTER_DUMP=$(<backup.sql)
 
-	if [ "$before_dump" != "$after_dump" ]; then
+	if [ "$BEFORE_DUMP" != "$AFTER_DUMP" ]; then
 		echo "Backup Successful."
 		exit 0
 	else
