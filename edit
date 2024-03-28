@@ -4,9 +4,9 @@ function blog_edit() {
 
 	if [ "$1" == "" ]; then
 		echo -e "Which entry would you like to overwrite?:\n\tex) 7\n\tex)last"
-		read OVR_NUM
+		read edit_num
 	else
-		OVR_NUM="$1"
+		edit_num="$1"
 	fi
 
 
@@ -22,14 +22,14 @@ function blog_edit() {
 	sed -i "s/\"/', CHAR(34), '/g" entry_dirty
 	sed -i "s/;/', CHAR(59), '/g" entry_dirty
 
-	ENTRY=$(<entry_dirty)
+	ENTRY_FILE=$(<entry_dirty)
 	rm entry_dirty
 	
 	
-	if [ "$OVR_NUM" == "last" ]; then
-                SQL="
+	if [ "$edit_num" == "last" ]; then
+                action="
                 	UPDATE entries
-               		SET entry = CONCAT('$ENTRY')
+               		SET entry = CONCAT('$ENTRY_FILE')
                		WHERE entry_number = (
                                 SELECT MAX(entry_number)
                                 FROM entries
@@ -37,27 +37,27 @@ function blog_edit() {
 
                 	SELECT *
                 	FROM entries
-                	WHERE entry_number = $OVERWRITE_NUM;
+                	WHERE entry_number = $edit_num;
                 "
         else
-		SQL="
+		action="
 			UPDATE entries
-			SET entry = CONCAT('$ENTRY')
-			WHERE (entry_number = $OVERWRITE_NUM);
+			SET entry = CONCAT('$ENTRY_FILE')
+			WHERE (entry_number = $edit_num);
 	
 			SELECT *
                 	FROM entries
-                	WHERE entry_number = $OVERWRITE_NUM;
+                	WHERE entry_number = $edit_num;
 	"
 	fi
 	
 
 	echo "Are you sure you want to permanently overwrite this entry?: (Y/N)"
-	read EDIT_ANS
+	read edit_ans
 
 
-	if [ $EDIT_ANS == "Y" ] || [ $EDIT_ANS == "y" ]; then
-		mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$SQL" | grep -v '^[-]*$' > output_dirty
+	if [ $edit_ans == "Y" ] || [ $edit_ans == "y" ]; then
+		mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$action" | grep -v '^[-]*$' > output_dirty
 		
 		if [ $? -eq 0 ]; then
 
@@ -69,9 +69,9 @@ function blog_edit() {
         		rm output_dirty
 
         		echo "Read last entry?: (Y/N)"
-        		read READ_ANS
+        		read read_ans
 
-        		if [ "$READ_ANS" == "Y" ] || [ "$READ_ANS" == "y" ]; then
+        		if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
                 		vim output
 				echo "Overwrite completed."
 				exit 0

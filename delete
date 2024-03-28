@@ -6,12 +6,12 @@ function blog_delete() {
                 echo -e "Which entries would you like to delete?:\n\tex) 7\n\tex) 1, 2, 5\n\tex) last"
                 read DEL_NUMS
         else
-                DEL_NUMS="$1"
+                del_nums="$1"
         fi
 
 	
-	if [ "$DEL_NUMS" == "last" ]; then
-		SQL="
+	if [ "$del_nums" == "last" ]; then
+		action="
                 	DELETE FROM entries
                 	WHERE entry_number = (
                                 SELECT MAX(entry_number)
@@ -22,9 +22,9 @@ function blog_delete() {
                 	FROM entries;
         	"
 	else
-		SQL="
+		action="
                         DELETE FROM entries
-                        WHERE entry_number IN ("$DEL_NUMS");
+                        WHERE entry_number IN ("$del_nums");
 
                         SELECT *
                         FROM entries;
@@ -33,12 +33,12 @@ function blog_delete() {
 
 
 	echo "Are you sure you want to permanently delete these entries?: (Y/N)"
-	read DEL_ANS
+	read del_ans
 
 
-	if [ $DEL_ANS == "Y" ] || [ $DEL_ANS == "y" ]; then
+	if [ $del_ans == "Y" ] || [ $del_ans == "y" ]; then
 		
-		mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$SQL" | grep -v '^[-]*$' > output_dirty
+		mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$action" | grep -v '^[-]*$' > output_dirty
 
                 if [ $? -eq 0 ]; then
 
@@ -50,9 +50,9 @@ function blog_delete() {
                         rm output_dirty
 
                         echo "Read all entries?: (Y/N)"
-                        read READ_ANS
+                        read read_ans
 
-                        if [ "$READ_ANS" == "Y" ] || [ "$READ_ANS" == "y" ]; then
+                        if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
                                 vim output
                                 echo "Deletion completed."
 				exit 0 

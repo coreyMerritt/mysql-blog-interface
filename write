@@ -14,12 +14,12 @@ function blog_write() {
 	sed -i "s/\"/', CHAR(34), '/g" entry_dirty
 	sed -i "s/;/', CHAR(59), '/g" entry_dirty
 
-	ENTRY=$(<entry_dirty)
+	ENTRY_FILE=$(<entry_dirty)
 	rm entry_dirty
 
-	SQL="
+	action="
 		INSERT INTO entries (entry) VALUES (
-		CONCAT('"$ENTRY"')
+		CONCAT('"$ENTRY_FILE"')
 		);
 
 		SELECT *
@@ -30,7 +30,7 @@ function blog_write() {
                 	);
 	"
 
-	mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$SQL" | grep -v '^[-]*$' > output_dirty
+	mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$action" | grep -v '^[-]*$' > output_dirty
 	
 	if [ $? -eq 0 ]; then
 
@@ -44,12 +44,12 @@ function blog_write() {
 		echo "Write successful."
 		
 		echo "Read last entry?: (Y/N)"
-		read READ_ANS
+		read read_ans
 
-		if [ "$READ_ANS" == "Y" ] || [ "$READ_ANS" == "y" ]; then
+		if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
 			vim output
 			exit 0
-		elif [ "$READ_ANS" == "N" ] || [ "$READ_ANS" == "n" ]; then
+		elif [ "$read_ans" == "N" ] || [ "$read_ans" == "n" ]; then
 			exit 0
 		fi
 	else
