@@ -2,45 +2,40 @@
 
 function blog_read() {
 	
-	if [ $1 != "" ]; then
+	
+        if [ "$1" == "" ]; then
+                echo "Which entries would you like to read?
+ex) 7
+ex) 1, 2, 5
+ex) all
+ex) last"
+                read READ_NUMS
+        else
+                READ_NUMS="$1"
+        fi
 
-		if [ "$1" == "all" ]; then
-			SQL="
-				SELECT *
-				FROM entries;
-			"
-		else
-			SQL="
-				SELECT *
-				FROM entries
-				WHERE entry_number IN ("$1");
-			"
-		fi
+	
+	if [ "$READ_NUMS" == "all" ]; then
+		SQL="
+			SELECT *
+			FROM entries;
+		"
+	elif [ "$READ_NUMS" == "last" ]; then
+		SQL="
+                      	SELECT *
+                       	FROM entries
+                      	WHERE entry_number = (
+                        	SELECT MAX(entry_number)
+                             	FROM entries
+                               	);
+             	"
 	else
-		echo "Which entries would you like to read?   ex)1, 2, 5   (Leave blank for last entry)"
-		read ENTRY_NUMS
-
-		if [ "$ENTRY_NUMS" == "" ]; then
-			SQL="	
-				SELECT *
-				FROM entries
-				WHERE entry_number = (
-					SELECT MAX(entry_number)
-					FROM entries
-					);
-			"
-		elif [ "$ENTRY_NUMS" == "all" ]; then
-			SQL="
-                        	SELECT *
-                        	FROM entries;
-                	"
-		else
-			SQL="
-				SELECT *
-				FROM entries
-				WHERE entry_number IN ("$ENTRY_NUMS");
-			"
-		fi
+		SQL="
+                    	SELECT *
+                       	FROM entries
+                  	WHERE entry_number IN ("$READ_NUMS");
+          	"
+		
 	fi
 
 	mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$SQL" | grep -v '^[-]*$' > output_dirty
