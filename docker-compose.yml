@@ -1,0 +1,8 @@
+version: '3.8'
+
+services:
+  mb_interface:
+    build:
+      context: .
+    image: img_mb_interface
+    container_name: mb_interface
