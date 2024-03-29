@@ -22,7 +22,7 @@ elif [ $1 == "delete" ]; then
 elif [ $1 == "backup" ]; then
 	blog_backup "$2"
 elif [ $1 == "publish" ]; then
-	publish_tools "$2"
+	local_publish "$2"
 else
 	echo -e "You've entered an invalid argument, please run again with one of the following:\n\tblog read\n\tblog write\n\tblog edit\n\tblog delete\n\tblog backup\n\tblog publish"
 	exit 1
