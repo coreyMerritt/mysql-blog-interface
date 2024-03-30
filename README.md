@@ -14,8 +14,8 @@
 <ul>
 https://docs.docker.com/get-docker/
 </ul>
-
-3. Clone this repository and enter the directory.
+<br></br>
+2. Clone this repository and enter the directory.
 
 ```bash
 git clone git@github.com:coreyMerritt/mysql-blog-interface
