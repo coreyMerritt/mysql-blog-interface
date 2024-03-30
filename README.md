@@ -11,9 +11,11 @@
 <h2>Installation</h2>
 
 1. Ensure that you have Docker properly installed on your system.
-   - https://docs.docker.com/get-docker/
+<ul>
+https://docs.docker.com/get-docker/
+</ul>
 
-<p style="padding-top: 100px;">2. Clone this repository and enter the directory.</p>
+3. Clone this repository and enter the directory.
 
 ```bash
 git clone git@github.com:coreyMerritt/mysql-blog-interface
