@@ -61,9 +61,8 @@ blog read last
 ```
 <br></br>
 <h3>write</h3>
-
+<b><p style="margin-bottom: 50px;">Description: </b>Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</p>
 <ul>
-   <li><b>Description: </b> Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</li>
    <li><b>arg1</b> <i>(optional)</i> --- You may specify a file other than the "entry" file if you prefer.</li>
 </ul>
 
@@ -76,9 +75,8 @@ blog write different_file.txt
      
 <br></br>
 <h3>edit</h3>
-
+<b><p style="margin-bottom: 50px;">Description: </b>Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</p>Edits an entry to the database. <u>Your edited entry should be placed in the "entry" file before running this command.</u></p>
 <ul>
-   <li><b>Description:</b> Edits an entry to the database. <u>Your edited entry should be placed in the "entry" file before running this command.</u>
       <ul>
          <li>The "read" action may be used to retrieve the previous entry as a base to edit.</li>
       </ul>
@@ -98,9 +96,8 @@ blog edit 5 different_file.txt
      
 <br></br>
 <h3>delete</h3>
-
+<b><p style="margin-bottom: 50px;">Description: </b>Deletes one or more entries from the database.</p>
 <ul>
-   <li><b>Description:</b> Deletes one or more entries from the database.</li>
    <li><b>arg1</b> <i>(optional)</i> --- You may specify one or more entries to delete.</li>
       <ul>
           <li>Quotes commas must be used as shown below for multiple entries.</li>  
@@ -122,7 +119,7 @@ blog delete last
 
 <br></br>
 <h3>Backup</h3>
-<li><b>Description:</b> Exports a backup.sql file of the local database to your current directory.</li>
+<b><p style="margin-bottom: 50px;">Exports a backup.sql file of the local database to your current directory.</p>
 
 
 ```bash
