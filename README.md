@@ -35,14 +35,11 @@ docker-compose exec mysql-blog-interface bash
 
 <h2>Documentation</h2>
 
-<h3>read</h3>
-
-<ul>
-   <b>Description:</b> Reads one or more entries from the database.
+<h3><u>Read</u></h3>
+<b>Description:</b> Reads one or more entries from the database.
    <li><b>arg1</b> <i>(optional)</i> --- You may include one or more entries to read.</li>
-      <ul>
+<ul>
          <li>Quotes commas must be used as shown below for multiple entries.</li>  
-      </ul>
 </ul>
 
 ```bash
