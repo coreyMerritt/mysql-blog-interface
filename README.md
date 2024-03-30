@@ -64,15 +64,20 @@ blog read last
 ```
 
 <h3>write</h3>
-Writes an entry to the database. Your entry should be written in the "entry" file before running this command.
- - arg1 (optional) --- file_name.txt
-  - You may specify a file other than the "entry" file if you prefer.
-     ```bash
-     blog write
-     ```
-     ```bash
-     blog write different_file.txt
-     ```
+
+<ul>
+   <li><b>Description:</b> Writes an entry to the database. Your entry should be written in the "entry" file before running this command.
+   <li><b>arg1</b> <i>(optional)</i> --- You may specify a file other than the "entry" file if you prefer.
+   </li>
+   </li>
+</ul>
+
+```bash
+blog write
+```
+```bash
+blog write different_file.txt
+```
      
 - edit --- Edits an entry to the database. Your edited entry should be placed in the "entry" file before running this command. The "read" action may be used to retrieve the previous entry as a base to edit.
  - arg1 (optional) = entry#      You may specify exactly one entry to edit.
