@@ -15,16 +15,17 @@ https://docs.docker.com/get-docker/
 </ul>
 <br></br>
 2. Clone this repository and enter the directory.
-
+<ul>
 ```bash
 git clone git@github.com:coreyMerritt/mysql-blog-interface
 ```
 ```bash
 cd mysql-blog-interface
 ```
+</ul>
 <br></br>
 3. Build, run and enter the container.
-
+<ul>
 ```bash
 docker-compose build
 ```
@@ -34,6 +35,7 @@ docker-compose up -d
 ```bash
 docker-compose exec mysql-blog-interface bash
 ```
+</ul>
 
 <h2>Documentation</h2>
 
