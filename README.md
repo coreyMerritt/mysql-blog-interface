@@ -10,7 +10,7 @@
 <br></br>
 <h2>Installation</h2>
 
-1. Ensure that you have Docker properly installed on your system.
+<h1>1. Ensure that you have Docker properly installed on your system.</h1>
 
 <ul>
 https://docs.docker.com/get-docker/
