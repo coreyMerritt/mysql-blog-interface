@@ -75,7 +75,7 @@ blog write different_file.txt
      
 <br></br>
 <h3>edit</h3>
-<b><p style="margin-bottom: 50px;">Description: </b>Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</p>Edits an entry to the database. <u>Your edited entry should be placed in the "entry" file before running this command.</u></p>
+<b><p style="margin-bottom: 50px;">Description: </b>Edits an entry to the database. Your edited entry should be placed in the "entry" file before running this command.</p>
 <ul>
       <ul>
          <li>The "read" action may be used to retrieve the previous entry as a base to edit.</li>
