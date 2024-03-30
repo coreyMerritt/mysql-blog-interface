@@ -11,7 +11,7 @@ I created this tool to facilitate interaction with a local MySQL blog and as an 
 ## Installation
 
 1. Ensure that you have Docker properly installed on your system.
-	      - https://docs.docker.com/get-docker/
+	      \n- https://docs.docker.com/get-docker/
 
 2. Clone this repository and enter the directory.
 
