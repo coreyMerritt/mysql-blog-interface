@@ -35,7 +35,7 @@ docker-compose exec mysql-blog-interface bash
 
 <h2>Documentation</h2>
 
-<h3><u>Read</u></h3>
+<h3>Read</h3>
 <b>Description:</b> Reads one or more entries from the database.
 <ul>
    
