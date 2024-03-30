@@ -36,7 +36,7 @@ docker-compose exec mysql-blog-interface bash
 <h2>Documentation</h2>
 
 <h3>Read</h3>
-<b>Description:</b> Reads one or more entries from the database.
+<b><p style="margin-bottom: 55px;">Description: </p></b>Reads one or more entries from the database.
 <ul>
    
    <li><b>arg1</b> <i>(optional)</i> --- You may include one or more entries to read.</li>
@@ -64,7 +64,7 @@ blog read last
 <h3>write</h3>
 
 <ul>
-   <li><b><p style="margin-bottom: 55px;">Description:</p></b> Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</li>
+   <li><b>Description: </b> Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</li>
    <li><b>arg1</b> <i>(optional)</i> --- You may specify a file other than the "entry" file if you prefer.</li>
 </ul>
 
