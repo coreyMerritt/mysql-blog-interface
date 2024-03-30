@@ -130,6 +130,8 @@ blog delete last
 blog backup
 ```
 
-## License
+<br></br>
+
+<h2>License</h2>
 
 This project is licensed under the [MIT License](LICENSE).
