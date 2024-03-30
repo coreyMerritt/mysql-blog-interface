@@ -23,12 +23,15 @@ cd mysql-blog-interface
 ```
 
 3. Build, run and enter the container.
-
-       ```bash
-       docker-compose build
-       docker-compose up -d
-       docker-compose exec mysql-blog-interface bash
-       ```
+```bash
+docker-compose build
+```
+```bash
+docker-compose up -d
+```
+```bash
+docker-compose exec mysql-blog-interface bash
+```
 
 ## Documentation
 
