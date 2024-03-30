@@ -37,8 +37,8 @@ docker-compose exec mysql-blog-interface bash
 
 Actions:
 
-  - read --- Reads one or more entries from the database.
-    - arg1 (optional) = entry#      You may specify one or more entries to be read. Quotes and parenthesis must be used as shown below for multiple entries.
+- read --- Reads one or more entries from the database.
+ - arg1 (optional) = entry#      You may specify one or more entries to be read. Quotes and parenthesis must be used as shown below for multiple entries.
      ```bash
      blog read
      ```
@@ -54,9 +54,9 @@ Actions:
      ```bash
      blog read last
      ```
-            
-  - write --- Writes an entry to the database. Your entry should be written in the "entry" file before running this command.
-    - arg1 (optional) = file_name.txt      You may specify a file other than the "entry" file if you prefer.
+
+- write --- Writes an entry to the database. Your entry should be written in the "entry" file before running this command.
+ - arg1 (optional) = file_name.txt      You may specify a file other than the "entry" file if you prefer.
      ```bash
      blog write
      ```
@@ -64,17 +64,17 @@ Actions:
      blog write different_file.txt
      ```
      
-  - edit --- Edits an entry to the database. Your edited entry should be placed in the "entry" file before running this command. The "read" action may be used to retrieve the previous entry as a base to edit.
-    - arg1 (optional) = entry#      You may specify exactly one entry to edit.
-    - arg2 (optional) = file_name.txt      You may specify a file other than the "entry" file if you prefer. 
+- edit --- Edits an entry to the database. Your edited entry should be placed in the "entry" file before running this command. The "read" action may be used to retrieve the previous entry as a base to edit.
+ - arg1 (optional) = entry#      You may specify exactly one entry to edit.
+ - arg2 (optional) = file_name.txt      You may specify a file other than the "entry" file if you prefer. 
      ```bash
      blog edit
      blog edit 5
      blog edit 5 different_file.txt
      ```
      
-  - delete --- Deletes one or more entries from the database.
-    - arg1 (optional) = entry#      You may specify one or more entries to edit. Quotes and parenthesis must be used as shown below for multiple entries.
+- delete --- Deletes one or more entries from the database.
+ - arg1 (optional) = entry#      You may specify one or more entries to edit. Quotes and parenthesis must be used as shown below for multiple entries.
      ```bash
      blog delete
      ```
@@ -88,7 +88,7 @@ Actions:
      blog delete last
      ```
      
-  - backup --- Exports a backup.sql file of the local database to your current directory.
+- backup --- Exports a backup.sql file of the local database to your current directory.
      ```bash
      blog backup
      ```
