@@ -12,7 +12,7 @@
 
 1. Ensure that you have Docker properly installed on your system.
 <ul>
-https://docs.docker.com/get-docker/
+   <li>https://docs.docker.com/get-docker/</li>
 </ul>
 <br></br>
 
