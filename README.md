@@ -75,10 +75,10 @@ blog write different_file.txt
      
 <br></br>
 <h3>Edit</h3>
-<b><p style="margin-bottom: 50px;">Description: </b>Edits an entry to the database. Your edited entry should be placed in the "entry" file before running this command.
+<b>Description: </b>Edits an entry to the database. Your edited entry should be placed in the "entry" file before running this command.
 <ul>
       <ul>
-         <li>The "read" action may be used to retrieve the previous entry as a base to edit.</li></p>
+         <li><p style="margin-bottom: 50px;">The "read" action may be used to retrieve the previous entry as a base to edit.</li></p>
       </ul>
    <li><b>arg1</b> <i>(optional)</i> --- You may specify exactly one entry to edit.</li>
    <li><b>arg2</b> <i>(optional)</i> --- You may specify a file other than the "entry" file if you prefer.</li>
