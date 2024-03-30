@@ -11,14 +11,16 @@ I created this tool to facilitate interaction with a local MySQL blog and as an 
 ## Installation
 
 1. Ensure that you have Docker properly installed on your system.
-	      \n- https://docs.docker.com/get-docker/
+   - https://docs.docker.com/get-docker/
 
-2. Clone this repository and enter the directory.
+3. Clone this repository and enter the directory.
 
-        ```bash
-        git clone git@github.com:coreyMerritt/mysql-blog-interface
-        cd mysql-blog-interface
-        ```
+```bash
+git clone git@github.com:coreyMerritt/mysql-blog-interface
+```
+```bash
+cd mysql-blog-interface
+```
 
 3. Build, run and enter the container.
 
