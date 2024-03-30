@@ -64,7 +64,7 @@ blog read last
 <h3>write</h3>
 
 <ul>
-   <li><b>Description:</b> Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</li>
+   <li><b><p style="margin-bottom: 5px;">Description:</p></b> Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</li>
    <li><b>arg1</b> <i>(optional)</i> --- You may specify a file other than the "entry" file if you prefer.</li>
 </ul>
 
