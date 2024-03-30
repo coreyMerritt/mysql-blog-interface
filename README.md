@@ -1,13 +1,17 @@
 <h1>MySQL Blog Interface</h1>
 
    I created this tool to facilitate interaction with a local MySQL blog and as an educational endeavor to learn Bash scripting. The majority of the meaningful code for this project is held [here.](blog_module)
+
 <br></br>
+
 <h2>Table of Contents</h2>
 
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [License](#license)
+
 <br></br>
+
 <h2>Installation</h2>
 
 1. Ensure that you have Docker properly installed on your system.
