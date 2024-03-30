@@ -1,13 +1,13 @@
 # MySQL Blog Interface
 
-I created this tool to facilitate interaction with a blog I keep in a local MySQL database and as an educational experience to learn Bash scripting.
+I created this tool to facilitate interaction with a local MySQL blog and as an educational endeavor to learn Bash scripting.
 <br></br>
 ## Table of Contents
 
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [License](#license)
-- <br></br>
+<br></br>
 ## Installation
 
 1. Ensure that you have Docker properly installed on your system.
