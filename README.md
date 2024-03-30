@@ -1,14 +1,14 @@
-# MySQL Blog Interface
+<h1>MySQL Blog Interface</h1>
 
 I created this tool to facilitate interaction with a local MySQL blog and as an educational endeavor to learn Bash scripting.
 <br></br>
-## Table of Contents
+<h2>Table of Contents</h2>
 
 - [Installation](#installation)
 - [Documentation](#documentation)
 - [License](#license)
 <br></br>
-<h1>Installation</h1>
+<h2>Installation</h2>
 
 1. Ensure that you have Docker properly installed on your system.
    - https://docs.docker.com/get-docker/
@@ -37,7 +37,7 @@ docker-compose exec mysql-blog-interface bash
 
 <h3>Actions:</h3>
 
-- read --- Reads one or more entries from the database.
+<h4>read</h4> --- Reads one or more entries from the database.
  - arg1 (optional) --- entry#
   - You may specify one or more entries to be read. Quotes and parenthesis must be used as shown below for multiple entries.
      ```bash
