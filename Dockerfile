@@ -17,4 +17,4 @@ RUN chmod +rwx /usr/local/bin/blog /usr/local/bin/blog_module backup.sql /usr/lo
 	apt-get install -y vim && \
 	apt-get clean
 
-CMD ["startup"]
+CMD ["docker_startup"]
