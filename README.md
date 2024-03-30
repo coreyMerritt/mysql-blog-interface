@@ -39,27 +39,28 @@ docker-compose exec mysql-blog-interface bash
 
 - <b>Description:</b> Reads one or more entries from the database.
 <ul>
-   <li>arg1 (optional) --- You may include an entry number to expedite the process.
+   <li><b>arg1</b> <i>(optional)</i> --- You may include an entry number to expedite the process.
       <ul>
          <li>You may specify one or more entries to be read. Quotes and parenthesis must be used as shown below for multiple entries.</li>
       </ul>
    </li>
 </ul>
-  ```bash
-     blog read
-     ```
-     ```bash 
-     blog read 19
-     ```
-     ```bash
-     blog read "4, 5, 6"
-     ```
-     ```bash
-     blog read all
-     ```
-     ```bash
-     blog read last
-     ```
+
+```bash
+blog read
+```
+```bash 
+blog read 19
+```
+```bash
+blog read "4, 5, 6"
+```
+```bash
+blog read all
+```
+```bash
+blog read last
+```
 
 - write --- Writes an entry to the database. Your entry should be written in the "entry" file before running this command.
  - arg1 (optional) --- file_name.txt
