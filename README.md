@@ -26,7 +26,9 @@ git clone git@github.com:coreyMerritt/mysql-blog-interface
 ```bash
 cd mysql-blog-interface
 ```
+
 <br></br>
+
 3. Build, run and enter the container.
 ```bash
 docker-compose build
