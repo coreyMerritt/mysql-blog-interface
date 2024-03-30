@@ -9,13 +9,6 @@
 - [License](#license)
 <br></br>
 <h2>Installation</h2>
-
-1. Ensure that you have Docker properly installed on your system.
-
-<ul>
-https://docs.docker.com/get-docker/
-</ul>
-
 <br></br>
 2. Clone this repository and enter the directory.
 
