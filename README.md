@@ -38,13 +38,14 @@ docker-compose exec mysql-blog-interface bash
 <h3>read</h3>
 
 <ul>
-   <li><b>Description:</b> Reads one or more entries from the database.
-   <li><b>arg1</b> <i>(optional)</i> --- You may include an entry number to expedite the process.
+   <li><b>Description:</b> Reads one or more entries from the database.</li>
+   <li><b>arg1</b> <i>(optional)</i> --- You may include an entry number to expedite the process.</li>
       <ul>
-         <li>You may specify one or more entries to be read. Quotes and commas must be used as shown below for multiple entries.</li>
+         <li>You may specify one or more entries to be read.</li>
+            <ul>
+               <li>Quotes commas must be used as shown below for multiple entries.</li>  
+            </ul>
       </ul>
-   </li>
-   </li>
 </ul>
 
 ```bash
@@ -66,10 +67,8 @@ blog read last
 <h3>write</h3>
 
 <ul>
-   <li><b>Description:</b> Writes an entry to the database. Your entry should be written in the "entry" file before running this command.
-   <li><b>arg1</b> <i>(optional)</i> --- You may specify a file other than the "entry" file if you prefer.
-   </li>
-   </li>
+   <li><b>Description:</b> Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</li>
+   <li><b>arg1</b> <i>(optional)</i> --- You may specify a file other than the "entry" file if you prefer.</li>
 </ul>
 
 ```bash
@@ -79,34 +78,60 @@ blog write
 blog write different_file.txt
 ```
      
-- edit --- Edits an entry to the database. Your edited entry should be placed in the "entry" file before running this command. The "read" action may be used to retrieve the previous entry as a base to edit.
- - arg1 (optional) = entry#      You may specify exactly one entry to edit.
- - arg2 (optional) = file_name.txt      You may specify a file other than the "entry" file if you prefer. 
-     ```bash
-     blog edit
-     blog edit 5
-     blog edit 5 different_file.txt
-     ```
+<br></br>
+<h3>edit</h3>
+
+<ul>
+   <li><b>Description:</b> Edits an entry to the database. <u>Your edited entry should be placed in the "entry" file before running this command.</u>
+      <ul>
+         <li>The "read" action may be used to retrieve the previous entry as a base to edit.</li>
+      </ul>
+   <li><b>arg1</b> <i>(optional)</i> --- You may specify exactly one entry to edit.</li>
+   <li><b>arg2</b> <i>(optional)</i> --- You may specify a file other than the "entry" file if you prefer.</li>
+</ul>
+
+```bash
+blog edit
+```
+```bash
+blog edit 5
+```
+```bash
+blog edit 5 different_file.txt
+```
      
-- delete --- Deletes one or more entries from the database.
- - arg1 (optional) = entry#      You may specify one or more entries to edit. Quotes and parenthesis must be used as shown below for multiple entries.
-     ```bash
-     blog delete
-     ```
-     ```bash
-     blog delete 5
-     ```
-     ```bash
-     blog delete "4, 5, 6"
-     ```
-     ```bash
-     blog delete last
-     ```
-     
-- backup --- Exports a backup.sql file of the local database to your current directory.
-     ```bash
-     blog backup
-     ```
+<br></br>
+<h3>delete</h3>
+
+<ul>
+   <li><b>Description:</b> Deletes one or more entries from the database.</li>
+   <li><b>arg1</b> <i>(optional)</i> --- You may specify one or more entries to delete.</li>
+      <ul>
+          <li>Quotes commas must be used as shown below for multiple entries.</li>  
+      </ul>
+</ul>
+
+```bash
+blog delete
+```
+```bash
+blog delete 5
+```
+```bash
+blog delete "4, 5, 6"
+```
+```bash
+blog delete last
+```
+
+<br></br>
+<h3>Backup</h3>
+<li><b>Description:</b> Exports a backup.sql file of the local database to your current directory.</li>
+
+
+```bash
+blog backup
+```
 
 ## License
 
