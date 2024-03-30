@@ -35,9 +35,9 @@ docker-compose exec mysql-blog-interface bash
 
 <h2>Documentation</h2>
 
-<h3>Action: read</h3>
+<h3>read</h3>
 
-- Description: Reads one or more entries from the database.
+- <b>Description:</b> Reads one or more entries from the database.
 - arg1 (optional) --- You may include an entry number to expedite the process.
 - You may specify one or more entries to be read. Quotes and parenthesis must be used as shown below for multiple entries.
      ```bash
