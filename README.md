@@ -92,12 +92,12 @@ blog edit 5 different_file.txt
 ```
      
 <br></br>
-<h3>delete</h3>
+<h3>Delete</h3>
 <b><p style="margin-bottom: 50px;">Description: </b>Deletes one or more entries from the database.</p>
 <ul>
    <li><b>arg1</b> <i>(optional)</i> --- You may specify one or more entries to delete.</li>
       <ul>
-          <li>Quotes commas must be used as shown below for multiple entries.</li>  
+          <li>Quotes and commas must be used as shown below for multiple entries.</li>  
       </ul>
 </ul>
 
@@ -116,7 +116,7 @@ blog delete last
 
 <br></br>
 <h3>Backup</h3>
-<b><p style="margin-bottom: 50px;">Exports a backup.sql file of the local database to your current directory.</p>
+<b><p style="margin-bottom: 50px;">Description: </b>Exports a backup.sql file of the local database to your current directory.</p>
 
 
 ```bash
