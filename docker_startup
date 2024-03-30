@@ -1,8 +1,0 @@
-#!/bin/bash
-
-service mysql start
-mysql -u root -e "ALTER USER 'root'@'localhost' IDENTIFIED WITH mysql_native_password BY 'resetme123';"
-mysql -u root -p'resetme123' -e 'CREATE DATABASE IF NOT EXISTS blog_entries' && \
-mysql -u root -p'resetme123' -D blog_entries < backup.sql && \
-rm backup.sql
-tail -f "/dev/null"
