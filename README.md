@@ -39,7 +39,7 @@ docker-compose build
 docker-compose up -d
 ```
 ```bash
-docker-compose exec mysql-blog-interface bash
+docker-compose exec mysql_blog_interface bash
 ```
 
 <br></br>
