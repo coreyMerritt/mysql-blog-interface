@@ -9,6 +9,7 @@
 - [License](#license)
 <br></br>
 <h2>Installation</h2>
+
 1. Ensure that you have Docker properly installed on your system.
 <ul>
 https://docs.docker.com/get-docker/
@@ -23,8 +24,8 @@ git clone git@github.com:coreyMerritt/mysql-blog-interface
 ```bash
 cd mysql-blog-interface
 ```
-
 <br></br>
+
 3. Build, run and enter the container.
 
 ```bash
