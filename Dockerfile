@@ -11,10 +11,13 @@ COPY backup.sql backup.sql
 COPY startup /usr/local/bin/startup
 
 RUN chmod +rwx /usr/local/bin/blog /usr/local/bin/blog_module backup.sql /usr/local/bin/startup && \
-	touch entry && \
-	apt-get update && \
-	apt-get install -y mysql-server && \
-	apt-get install -y vim && \
-	apt-get clean
+	touch entry
+
+RUN apt-get update
+	
+RUN apt-get install -y mysql-server && \
+	apt-get install -y vim
+	
+RUN apt-get clean
 
 CMD ["startup"]
