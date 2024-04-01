@@ -18,8 +18,7 @@ function sql() {
 		if [ "$2" == "all" ]; then
 			
 			echo "	SELECT *
-         			FROM entries
-				ORDER BY entry_number DESC;"
+         			FROM entries;"
 
 		elif [ "$2" == "last" ]; then
 			
@@ -34,8 +33,7 @@ function sql() {
 			
 			echo "	SELECT *
                         	FROM entries
-                        	WHERE entry_number IN ("$2")
-                                ORDER BY entry_number DESC;"
+                        	WHERE entry_number IN ("$2");"
 	
 		fi
 	# Write Branch
@@ -78,8 +76,7 @@ function sql() {
 
                         	SELECT *
                         	FROM entries
-				WHERE (entry_number = "$2")
-                                ORDER BY entry_number DESC;"
+				WHERE (entry_number = "$2");"
 
 		fi
 	# Delete Branch
@@ -93,8 +90,7 @@ function sql() {
                                 	);
 
                         	SELECT *
-                        	FROM entries
-                                ORDER BY DESC;"
+                        	FROM entries;"
 
 		else
 
@@ -102,8 +98,7 @@ function sql() {
                         	WHERE entry_number IN ("$2");
 
                         	SELECT *
-                        	FROM entries
-                                ORDER BY DESC;"
+                        	FROM entries;"
 		
 		fi
 	fi
