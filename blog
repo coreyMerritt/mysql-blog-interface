@@ -12,7 +12,7 @@ else
 fi
 MYSQL_USER="root"
 MYSQL_DATABASE="blog_entries"
-MYSQL_PASS=$(grep "Password: " /usr/bin/local/config.yml | sed 's/.*Password: //')
+MYSQL_PASS=$(grep "Password: " /usr/bin/local/blog_config.yml | sed 's/.*Password: //')
 
 # Checks if entered action is valid, if not returns a helpful error.
 if [ $# -eq 0 ]; then
