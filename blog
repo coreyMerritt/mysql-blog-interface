@@ -2,10 +2,17 @@
 
 source "/usr/local/bin/blog_module"
 
+cfg_address=$(sed '1q;d' "./local_config" 2>/dev/null)
+
 # MySQL Constants.
-MYSQL_HOST="localhost"
+if [ "$cfg_address" == "" ]; then
+	MYSQL_HOST="localhost"
+else
+	MYSQL_HOST="$cfg_address"
+fi
 MYSQL_USER="root"
 MYSQL_DATABASE="blog_entries"
+MYSQL_PASS=$(grep "Password: " /usr/bin/local/config.yml | sed 's/.*Password: //')
 
 # Checks if entered action is valid, if not returns a helpful error.
 if [ $# -eq 0 ]; then
