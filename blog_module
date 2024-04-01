@@ -347,7 +347,12 @@ function blog_delete() {
 function blog_backup() {
 	# Gets a snapshot of the backup before and after trying to overwrite it.	
         BEFORE_DUMP=$(<backup.sql)
-        mysqldump --default-character-set=utf8 -u root -p blog_entries > backup.sql
+	# Determines whether the client is being run inside or outside the container.
+	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
+        	mysqldump --default-character-set=utf8 -u root -p blog_entries > backup.sql
+	else
+		docker-compose exec mysql_blog_interface mysqldump --default-character-set=utf8 -u root -p blog_entries > backup.sql
+	fi
         AFTER_DUMP=$(<backup.sql)
 
 	# Checks if the snapshots are different to determine success.
