@@ -2,11 +2,12 @@
 
 
 function execute_mysql() {
+	# Determines whether the client is being run inside or outside the container, then:
 	# Enters the DBMS, submits the query, and returns the data to a file "output_dirty."
 	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
 		mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -s -e "$1" | grep -v '^[-]*$' > output_dirty
 	else
-		docker-compose exec mysql_blog_interface mysql --default-extra-file=/usr/local/bin/blog_config_mysql.cnf -e "$1" | grep -v '^[-]*$' > output_dirty
+		docker-compose exec mysql_blog_interface mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -e "$1" | grep -v '^[-]*$' > output_dirty
 	fi
 }
 
