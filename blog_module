@@ -349,9 +349,9 @@ function blog_backup() {
         BEFORE_DUMP=$(<backup.sql)
 	# Determines whether the client is being run inside or outside the container.
 	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
-        	mysqldump --default-character-set=utf8 --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf blog_entries > backup.sql
+        	mysqldump --default-character-set=utf8 --defaults-file=/usr/local/share/blog_config_mysql.cnf blog_entries > backup.sql
 	else
-		docker-compose exec mysql_blog_interface mysqldump --default-character-set=utf8 --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf blog_entries > backup.sql
+		docker-compose exec mysql_blog_interface mysqldump --default-character-set=utf8 --defaults-file=/usr/local/share/blog_config_mysql.cnf blog_entries > backup.sql
 	fi
         AFTER_DUMP=$(<backup.sql)
 
