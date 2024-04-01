@@ -19,8 +19,7 @@ RUN chmod +rwx /usr/local/bin/blog /usr/local/bin/blog_module backup.sql /usr/lo
 
 RUN apt-get update
 	
-RUN apt-get install -y mysql-server && \
-	apt-get install -y vim
+RUN apt-get install -y mysql-server
 	
 RUN apt-get clean
 
