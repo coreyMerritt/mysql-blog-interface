@@ -1,0 +1,5 @@
+[client]
+user = root
+password = resetme123
+host = localhost
+database = blog_entries
