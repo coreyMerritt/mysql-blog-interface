@@ -96,10 +96,10 @@ blog write different_file.txt
 blog edit
 ```
 ```bash
-blog edit 5
+blog edit 19
 ```
 ```bash
-blog edit 5 different_file.txt
+blog edit 19 different_file.txt
 ```
      
 <br></br>
