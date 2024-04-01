@@ -3,7 +3,7 @@
 
 function execute_mysql() {
 	# Enters the DBMS, submits the query, and returns the data to a file "output_dirty."	
-	mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p -D "$MYSQL_DATABASE" -e "$1" | grep -v '^[-]*$' > output_dirty
+	mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASS" -D "$MYSQL_DATABASE" -e "$1" | grep -v '^[-]*$' > output_dirty
 }
 
 
@@ -13,7 +13,8 @@ function sql() {
 		if [ "$2" == "all" ]; then
 			
 			echo "	SELECT *
-         			FROM entries;"
+         			FROM entries
+				ORDER BY entry_number DESC;"
 
 		elif [ "$2" == "last" ]; then
 			
@@ -28,7 +29,8 @@ function sql() {
 			
 			echo "	SELECT *
                         	FROM entries
-                        	WHERE entry_number IN ("$2");"
+                        	WHERE entry_number IN ("$2")
+                                ORDER BY entry_number DESC;"
 	
 		fi
 	# Write Branch
@@ -52,13 +54,16 @@ function sql() {
 			echo "	UPDATE entries
                         	SET entry = CONCAT('$3')
                        	 	WHERE entry_number = (
-                                	SELECT MAX(entry_number)i
+                                	SELECT MAX(entry_number)
                                 	FROM (SELECT * FROM entries) AS temp
                                 );
 
                         	SELECT *
                         	FROM entries
-				WHERE entry_number = (                                                                                        SELECT MAX(entry_number)                                                                              FROM entries                                                                                  );"
+				WHERE entry_number = (
+					SELECT MAX(entry_number)
+					FROM entries
+					);"
 
 		else
 	
@@ -68,7 +73,8 @@ function sql() {
 
                         	SELECT *
                         	FROM entries
-				WHERE (entry_number = "$2");"
+				WHERE (entry_number = "$2")
+                                ORDER BY entry_number DESC;"
 
 		fi
 	# Delete Branch
@@ -82,7 +88,8 @@ function sql() {
                                 	);
 
                         	SELECT *
-                        	FROM entries;"
+                        	FROM entries
+                                ORDER BY DESC;"
 
 		else
 
@@ -90,7 +97,8 @@ function sql() {
                         	WHERE entry_number IN ("$2");
 
                         	SELECT *
-                        	FROM entries;"
+                        	FROM entries
+                                ORDER BY DESC;"
 		
 		fi
 	fi
