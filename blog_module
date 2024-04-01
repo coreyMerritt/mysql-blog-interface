@@ -2,8 +2,12 @@
 
 
 function execute_mysql() {
-	# Enters the DBMS, submits the query, and returns the data to a file "output_dirty."	
-	mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASS" -D "$MYSQL_DATABASE" -e "$1" | grep -v '^[-]*$' > output_dirty
+	# Enters the DBMS, submits the query, and returns the data to a file "output_dirty."
+	if [ $(grep "Container: " /usr/bin/local/blog_config.yml | sed 's/.*Container//') == "True" ]; then
+		mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASS" -D "$MYSQL_DATABASE" -e "$1" | grep -v '^[-]*$' > output_dirty
+	else
+		docker-compose exec mysql_blog_interface mysql -h "$MYSQL_HOST" -u "$MYSQL_USER" -p"$MYSQL_PASS" -D "$MYSQL_DATABASE" -e "$1" | grep -v '^[-]*$' > output_dirty
+	fi
 }
 
 
