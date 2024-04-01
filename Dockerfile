@@ -6,6 +6,8 @@ COPY blog /usr/local/bin/blog
 
 COPY blog_module /usr/local/bin/blog_module
 
+COPY blog_config.yml /usr/local/bin/blog_config.yml
+
 COPY backup.sql backup.sql
 
 COPY startup /usr/local/bin/startup
