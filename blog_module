@@ -128,22 +128,17 @@ function prep_entry() {
 
 function clean_output() {
 
-        output_dirty="$1"
-	#echo "$output_dirty" > output_dirty.txt	
+        output_dirty="$1"	
 
 	# Removes some cluttery output from the MySQL output.
 	output_pass_one="$(echo "$output_dirty" | grep -v '^[-]*$')"
-	# Puts tabs back into the formatting.
-	#output_pass_two="$(echo -e "$output_pass_one" | sed 's/\\t/\t/g')"
-	# Puts newlines back into the formatting."
-	#output_pass_three="$(echo -e "$output_pass_two" | sed 's/\\n/\n/g')"
 	# Handles different output fields to make things more visibly pleasant.
-	output_pass_four="$(echo "$output_pass_one" | sed 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')"
+	output_pass_two="$(echo "$output_pass_one" | sed 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')"
 	# Removes the header displaying the fields outputted by MySQL.
-	output_pass_five="$(echo "$output_pass_four" | sed '1d')"
+	output_pass_three="$(echo "$output_pass_two" | sed '1d')"
 
 	# Return the formatted output.
-        echo "$output_pass_five"
+        echo "$output_pass_three"
 } 
 
 
