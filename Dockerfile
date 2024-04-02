@@ -14,8 +14,7 @@ COPY backup.sql backup.sql
 
 COPY startup /usr/local/bin/startup
 
-RUN chmod +rwx /usr/local/bin/blog /usr/local/bin/blog_module backup.sql /usr/local/bin/startup && \
-	touch entry
+RUN chmod +rwx /usr/local/bin/blog /usr/local/bin/blog_module backup.sql /usr/local/bin/startup
 
 RUN apt-get update
 	
