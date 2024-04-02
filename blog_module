@@ -287,7 +287,7 @@ function blog_edit() {
 
 		# Allows the user to edit the entry.
 		echo "$output" > "$file_name"
-		vim "$file_name"
+		vim +"set wrap linebreak" -c "startinsert" "$file_name"
 
 		# Warns the user.
         	echo "Are you sure you want to permanently overwrite this entry? (Y/N)"
@@ -396,7 +396,8 @@ function blog_delete() {
 
 function blog_backup() {
 	# Gets a snapshot of the backup before and after trying to overwrite it.	
-        BEFORE_DUMP=$(<backup.sql)
+        touch backup.sql
+	BEFORE_DUMP=$(<backup.sql)
 
 	# Determines whether the client is being run inside or outside the container.
 	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
