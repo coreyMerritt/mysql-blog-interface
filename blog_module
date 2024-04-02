@@ -326,11 +326,8 @@ function blog_delete() {
                 del_nums="$2"
         fi
 
-	# Checks if the entry exists.
+	# Checks if the entry exists, informs user, and performs a plural check.
 	output="$(blog read "$del_nums")"
-	echo "$output" > debug.txt
-
-	#Informs user + plural check.
 	if [[ ! "$output" =~ [^[:space:]] ]]; then
 		if [ $(echo "$del_nums" | grep -oE '[0-9]+' | wc -l) -eq 1 ]; then
                 	echo "That entry doesn't exist."
@@ -343,7 +340,7 @@ function blog_delete() {
         	mysql_action=$(sql "$action" "$del_nums" 2>/dev/null)
   
 		# Warns the user. Singular/plural check.
-		if [ $(echo "$del_nums" | grep -oE '[0-9]+' | wc -l) -eq 1 ]; then
+		if [ $(echo "$del_nums" | grep -oE '[0-9]+' | wc -l) -le 1 ]; then
 			echo "Are you sure you want to permanently delete that entry? (Y/N)"
 		else        
 			echo "Are you sure you want to permanently delete those entries? (Y/N)"
