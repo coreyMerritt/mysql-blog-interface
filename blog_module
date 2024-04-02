@@ -152,7 +152,7 @@ function cleanup() {
 function blog_read() {
 	# Asks the user what they want to read if it wasn't specified in args.
         if [ "$1" == "" ]; then
-                echo -e "Which entries would you like to read?\n\tex) 7\n\tex) 1, 2, 5\n\tex) last\n\tex) all"
+                echo -e "Which entries would you like to read?\n\tex) 19\n\tex) 5, 13, 19\n\tex) last\n\tex) all"
                 read read_nums
         else
                 read_nums="$1"
@@ -233,7 +233,7 @@ function blog_write() {
 function blog_edit() {
 	# Asks the user what they want to edit if it wasn't specified in args.
         if [ "$1" == "" ]; then
-                echo -e "Which entry would you like to overwrite?\n\tex) 7\n\tex)last"
+                echo -e "Which entry would you like to overwrite?\n\tex) 19\n\tex)last"
                 read edit_num
         else
                 edit_num="$1"
@@ -292,7 +292,7 @@ function blog_edit() {
 function blog_delete() {
 	# Asks the user what they want to edit if it wasn't specified in args.
         if [ "$1" == "" ]; then
-                echo -e "Which entries would you like to delete?\n\tex) 7\n\tex) 1, 2, 5\n\tex) last"
+                echo -e "Which entries would you like to delete?\n\tex) 19\n\tex) 5, 13, 19\n\tex) last"
                 read del_nums
         else
                 del_nums="$1"
