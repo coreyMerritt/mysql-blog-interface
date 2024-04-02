@@ -145,8 +145,9 @@ function clean_output() {
 function show_output() {
 	# Fixes the output width to the size of the user's terminal and enables word wrapping.
 	output="$1"
-	echo -e "$output" | fold -s -w $(tput cols)
-}
+	output_wrapped=$(echo "$output" | fold -s -w $(tput cols))
+	echo -e "$output_wrapped"
+}	
 
 
 function blog_read() {
@@ -170,10 +171,10 @@ function blog_read() {
 	# Determines success and reports. Shows user their result if possible.
         if [ "$mysql_err" == 0 ]; then
 		if [ "$3" == "clean" ]; then
-                       	echo -e "$output"
+                       	echo -e "$(echo "$output" | fold -s -w $(tput cols))"
             	else
                 	echo " "
-                   	echo -e "$output"
+			echo -e "$(echo "$output" | fold -s -w $(tput cols))"
                    	echo " "
           	fi
                 exit 0
@@ -318,7 +319,7 @@ function blog_edit() {
 
                         	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
 					echo " "
-					echo -e "$(blog read "$edit_num" "clean")"
+					echo -e "$(blog read "$edit_num")"
 					echo " "
 					exit 0
                         	else
