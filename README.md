@@ -62,7 +62,7 @@ blog read
 blog read 19
 ```
 ```bash
-blog read "4, 5, 6"
+blog read "5, 13, 19"
 ```
 ```bash
 blog read all
@@ -116,10 +116,10 @@ blog edit 19 different_file.txt
 blog delete
 ```
 ```bash
-blog delete 5
+blog delete 19
 ```
 ```bash
-blog delete "4, 5, 6"
+blog delete "5, 13, 19"
 ```
 ```bash
 blog delete last
