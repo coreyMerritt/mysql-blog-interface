@@ -96,15 +96,12 @@ function sql() {
 	elif [ "$1" == "delete" ]; then
 		if [ "$2" == "last" ]; then
 
-			echo "DELETE FROM entries
-                        	WHERE entry_number = (
-                                	SELECT MAX(entry_number)
-                                	FROM entries
-                                	);"
+			echo "	DELETE FROM entries
+                        	WHERE entry_number = (                                                                                                          SELECT MAX(entry_number)                                                                                                FROM (SELECT * FROM entries) AS temp                                                                            );"
 
 		else
 
-			echo "DELETE FROM entries
+			echo "	DELETE FROM entries
                         	WHERE entry_number IN ("$2");"
 		
 		fi
