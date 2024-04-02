@@ -205,36 +205,53 @@ function blog_write() {
                 file_name="$2"
         fi
 
+	# Checks if the user already wrote their entry, or wants a blank file to write in.
+	echo "Clear a new file for writing? (Y/N)"
+	read empty_ans
+	if [ "$empty_ans" == "Y" ] || [ "$empty_ans" == "y" ]; then
+		truncate -s 0 "$file_name"
+		vim +"set wrap linebreak" -c "startinsert" "$file_name"
+	fi
+
 	
-	# Prep entry file by formatting for MySQL, determine SQL to be used, and execute.
-	# Stores MySQL exit code and cleaned output.
-        ENTRY_FILE=$(prep_entry "$file_name")
-        mysql_action=$(sql "$action" "$ENTRY_FILE")
-	output_and_err=$(execute_mysql "$mysql_action")
-        mysql_err="${output_and_err%% *}"
-        output="${output_and_err#* }"
+	echo "Are you sure you want to submit this entry? (Y/N)"
+	read write_ans
 
-
-	# Report results to the user, show a finalized version of their write if requested.
-        if [ "$mysql_err" !=  0 ]; then
-	
-		echo "Something went wrong."
-                exit 1
-
+	if [ "$write_ans" != "Y" ] && [ "$write_ans" != "y" ]; then
+		echo "Nothing was submitted."
+		exit 0
 	else
-                echo "Write successful."
-                echo "Read last entry?: (Y/N)"
-                read read_ans
+	 	# Prep entry file by formatting for MySQL, determine SQL to be used.
+        	ENTRY_FILE=$(prep_entry "$file_name")
+        	mysql_action=$(sql "$action" "$ENTRY_FILE")
 
-                if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
-			echo " "
-			echo -e "$(blog read "last")"
-			echo " "
-			exit 0
-                else
-			exit 0
-                fi
-        fi
+		# Executes --- stores MySQL exit code & cleaned output.
+		output_and_err=$(execute_mysql "$mysql_action")
+        	mysql_err="${output_and_err%% *}"
+      	 	output="${output_and_err#* }"
+
+
+		# Report results to the user, show a finalized version of their write if requested.
+        	if [ "$mysql_err" !=  0 ]; then
+	
+			echo "Something went wrong."
+                	exit 1
+
+		else
+                	echo "Write successful."
+                	echo "Read last entry?: (Y/N)"
+                	read read_ans
+
+                	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
+				echo " "
+				echo -e "$(blog read "last")"
+				echo " "
+				exit 0
+                	else
+				exit 0
+                	fi
+        	fi
+	fi
 }
 
 
