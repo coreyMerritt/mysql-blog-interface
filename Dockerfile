@@ -23,4 +23,11 @@ RUN apt-get install -y mysql-server && \
 	
 RUN apt-get clean
 
+# Startup:
+# 	- Starts MySQL.
+#	- Sets a default password of 'resetme123'.
+#	- Creates the database.
+#	- Populates the database.
+#	- Cleans up.
+#	- Monitors /dev/null to keep the container running.	
 CMD ["startup"]
