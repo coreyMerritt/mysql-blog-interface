@@ -206,7 +206,7 @@ function blog_write() {
 
 		# Prompts user to write their entry.
                 truncate -s 0 "$file_name"
-                vim +"set wrap linebreak" -c "startinsert" "$file_name"
+                vim -c "startinsert" "$file_name"
 
         else
                 file_name="$2"
@@ -285,7 +285,7 @@ function blog_edit() {
 
 		# Allows the user to edit the entry.
 		echo "$output" > "$file_name"
-		vim +"set wrap linebreak" -c "startinsert" "$file_name"
+		vim -c "startinsert" "$file_name"
 
 		# Warns the user.
         	echo "Are you sure you want to permanently overwrite this entry? (Y/N)"
