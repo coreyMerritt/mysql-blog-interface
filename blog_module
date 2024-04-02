@@ -3,7 +3,7 @@
 
 function execute_mysql() {
 	# Determines whether the client is being run inside or outside the container, then:
-	# Enters the DBMS, submits the query, and returns the data to a variable "output".
+	# Enters the DBMS, submits the query, and places the data in "output".
 	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
 		output_dirty=$(mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1")
 		mysql_err="$?"
@@ -12,6 +12,7 @@ function execute_mysql() {
 		mysql_err=$(docker-compose exec mysql_blog_interface echo "$?")
 	fi
 
+	# Returns cleaned output and the MySQL exit code.
 	output="$(clean_output "$output_dirty")"
 	echo -e "$mysql_err $output"
 }
@@ -97,7 +98,10 @@ function sql() {
 		if [ "$2" == "last" ]; then
 
 			echo "	DELETE FROM entries
-                        	WHERE entry_number = (                                                                                                          SELECT MAX(entry_number)                                                                                                FROM (SELECT * FROM entries) AS temp                                                                            );"
+                        	WHERE entry_number = (                                                                                                          
+					SELECT MAX(entry_number)                                                                                                
+					FROM (SELECT * FROM entries) AS temp                                                                           
+					);"
 
 		else
 
@@ -119,6 +123,7 @@ function prep_entry() {
 	entry_pass_two="$(echo "$entry_pass_one" | sed "s/\"/', CHAR(34), '/g")"
 	# Replaces semicolons.
 	entry_pass_three="$(echo "$entry_pass_two" | sed "s/;/', CHAR(59), '/g")"
+	# Replaces newline.
 	entry_pass_four="$(echo "$entry_pass_three" | sed ":a;N;$!ba;s/\n/', CHAR(10), '/g")"
 
 	# Returns formatted text.
@@ -140,14 +145,6 @@ function clean_output() {
 	# Return the formatted output.
         echo "$output_pass_three"
 } 
-
-
-function show_output() {
-	# Fixes the output width to the size of the user's terminal and enables word wrapping.
-	output="$1"
-	output_wrapped=$(echo "$output" | fold -s -w $(tput cols))
-	echo -e "$output_wrapped"
-}	
 
 
 function blog_read() {
