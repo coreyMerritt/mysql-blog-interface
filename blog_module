@@ -382,18 +382,21 @@ function blog_backup() {
 	# Determines whether the client is being run inside or outside the container.
 	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
         	mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > backup.sql
+		mysql_err="$?"
 	else
 		docker-compose exec mysql_blog_interface mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > backup.sql
+		mysql_err="$(docker-compose exec mysql_blog_interface echo "$?")"
 	fi
 
         AFTER_DUMP=$(<backup.sql)
 
 	# Checks if the snapshots are different to determine success.
-        if [ "$BEFORE_DUMP" != "$AFTER_DUMP" ]; then
+        if [ "$BEFORE_DUMP" != "$AFTER_DUMP" ] && [ "$mysql_err" == "0" ]; then
                 echo "Backup successful."
 		exit 0
         else
                 echo "Something went wrong. Your backup was not updated."
+		exit 1
         fi
 }
 
