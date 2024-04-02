@@ -5,10 +5,11 @@ function execute_mysql() {
 	# Determines whether the client is being run inside or outside the container, then:
 	# Enters the DBMS, submits the query, and returns the data to a file "output_dirty."
 	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
-		mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1" | grep -v '^[-]*$' > output_dirty
+		output=$(mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1" | grep -v '^[-]*$')
 	else
-		docker-compose exec mysql_blog_interface mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1" | grep -v '^[-]*$' > output_dirty
+		output=$(docker-compose exec mysql_blog_interface mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1" | grep -v '^[-]*$')
 	fi
+	echo -e "$output"
 }
 
 
@@ -82,46 +83,39 @@ function sql() {
 
 
 function prep_entry() {
-	# Moves the entry to a temporary file to be formatted.
-	cp "$1" entry_dirty
+	# Moves the entry to a variable to be formatted.
+	entry=$(<"$1")
 
-	# Formats the entry file such that it won't conflict with 
+	# Formats the entry such that it won't conflict with 
 	# SQL commands and can be reversed upon retrieval.
-        sed -i "s/'/', CHAR(39), '/g" entry_dirty
-        sed -i "s/\"/', CHAR(34), '/g" entry_dirty
-        sed -i "s/;/', CHAR(59), '/g" entry_dirty
+	entry_pass_one=$(echo "$entry" | sed -i "s/'/', CHAR(39), '/g")
+	entry_pass_two=$(echo "$entry_pass_one" | sed -i "s/\"/', CHAR(34), '/g")
+	entry_pass_three=$(echo "$entry_pass_two" | sed -i "s/;/', CHAR(59), '/g")
 
 	# Returns formatted text.
-	echo "$(<entry_dirty)"
+	echo -e "$entry_pass_three"
 }
 
 
 function clean_output() {
-        # Reverse engineers some of the escape sequences that MySQL outputs.
-        sed -i 's/\\t/\t/g' output_dirty
-        sed -i 's/\\n/\n/g' output_dirty
+        output_dirty="$1"
+	
+	# Reverse engineers some of the escape sequences that MySQL outputs.
+	output_pass_one=$(echo -e "$output_dirty" | sed -i 's/\\t/\t/g')
+	output_pass_two=$(echo -e "$output_pass_one" | sed -i 's/\\n/\n/g')
 
 	# Additional formatting to make things more digestable in a lightweight text editor.
-	sed -i 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g' output_dirty
+	output_pass_three=$(echo -e "$output_pass_two" | sed -i 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')
 
 	# Moves the output to a long-term file once it's formatted.
-        cp output_dirty output
+        echo -e "$output_pass_three"
 } 
 
 
 function show_output() {
 	# Fixes the output width to the size of the user's terminal and enables word wrapping.
-	output=$(<output)
-	echo -e "$output \n" | fold -s -w $(tput cols)
-}
-
-
-function cleanup() {
-	# Removes temp files.
-	touch output_dirty
-	rm output_dirty
-	touch entry_dirty
-	rm entry_dirty
+	output="$1"
+	echo -e "$output\n" | fold -s -w $(tput cols)
 }
 
 
