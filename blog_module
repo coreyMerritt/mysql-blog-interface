@@ -136,7 +136,7 @@ function clean_output() {
 function show_output() {
 	# Fixes the output width to the size of the user's terminal and enables word wrapping.
 	output=$(<output)
-	echo "$output" | fold -s -w $(tput cols)
+	echo -e "$output \n" | fold -s -w $(tput cols)
 }
 
 
