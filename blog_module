@@ -425,11 +425,9 @@ function local_publish() {
 	# Report results to user.
         if [ "$?" -eq 0 ]; then
                 echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\n\tblog ..."
-                cleanup
 		exit 0
         else
                 echo "Something went wrong."
-                cleanup
 		exit 1
         fi
 }
