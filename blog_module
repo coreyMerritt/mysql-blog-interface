@@ -201,20 +201,17 @@ function blog_write() {
 	
 	# If file was specified in args, we use that. If not, we use "entry."
         if [ "$2" == "" ]; then
+
                 file_name="./entry"
+
+		# Prompts user to write their entry.
+                truncate -s 0 "$file_name"
+                vim +"set wrap linebreak" -c "startinsert" "$file_name"
+
         else
                 file_name="$2"
         fi
-
-	# Checks if the user already wrote their entry, or wants a blank file to write in.
-	echo "Clear a new file for writing? (Y/N)"
-	read empty_ans
-	if [ "$empty_ans" == "Y" ] || [ "$empty_ans" == "y" ]; then
-		truncate -s 0 "$file_name"
-		vim +"set wrap linebreak" -c "startinsert" "$file_name"
-	fi
-
-	
+		
 	echo "Are you sure you want to submit this entry? (Y/N)"
 	read write_ans
 
