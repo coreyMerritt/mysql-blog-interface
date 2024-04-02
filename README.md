@@ -59,10 +59,10 @@ docker-compose exec mysql_blog_interface bash
 blog read
 ```
 ```bash 
-blog read 19
+blog read 5
 ```
 ```bash
-blog read "4, 5, 6"
+blog read "13, 19, 6"
 ```
 ```bash
 blog read all
@@ -72,7 +72,7 @@ blog read last
 ```
 <br></br>
 <h3>Write</h3>
-<b><p style="margin-bottom: 50px;">Description: </b>Writes an entry to the database. Your entry should be written in the "entry" file before running this command.</p>
+<b><p style="margin-bottom: 50px;">Description: </b>Writes an entry to the database.</p>
 <ul>
    <li><b>arg1</b> <i>(optional)</i> --- You may specify a file other than the "entry" file to be submitted.</li>
 </ul>
@@ -86,20 +86,20 @@ blog write different_file.txt
      
 <br></br>
 <h3>Edit</h3>
-<b><p style="margin-bottom: 50px;">Description: </b>Edits an entry to the database. Your edited entry should be placed in the "entry" file before running this command. (The "read" action may be used to retrieve the previous entry as a base to edit.)</p>
+<b><p style="margin-bottom: 50px;">Description: </b>Edits an entry from the database.</p>
 <ul>
    <li><b>arg1</b> <i>(optional)</i> --- You may specify exactly one entry to edit.</li>
-   <li><b>arg2</b> <i>(optional)</i> --- You may specify a file other than the "entry" file to submit your changes.</li>
+   <li><b>arg2</b> <i>(optional)</i> --- You may specify a file other than the "entry" file to work in.</li>
 </ul>
 
 ```bash
 blog edit
 ```
 ```bash
-blog edit 5
+blog edit 19
 ```
 ```bash
-blog edit 5 different_file.txt
+blog edit 19 different_file.txt
 ```
      
 <br></br>
@@ -116,10 +116,10 @@ blog edit 5 different_file.txt
 blog delete
 ```
 ```bash
-blog delete 5
+blog delete 19
 ```
 ```bash
-blog delete "4, 5, 6"
+blog delete "5, 13, 19"
 ```
 ```bash
 blog delete last
