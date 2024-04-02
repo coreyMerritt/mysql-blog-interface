@@ -41,14 +41,7 @@ function sql() {
 	
 		echo "	INSERT INTO entries (entry) VALUES (
                 		CONCAT('"$2"')
-                	);
-
-                	SELECT *
-                	FROM entries
-             	 	WHERE entry_number = (
-                        	SELECT MAX(entry_number)
-                        	FROM entries
-                        );"
+                	);"
 	
 	# Edit Branch
 	elif [ "$1" == "edit" ]; then
@@ -59,24 +52,13 @@ function sql() {
                        	 	WHERE entry_number = (
                                 	SELECT MAX(entry_number)
                                 	FROM (SELECT * FROM entries) AS temp
-                                );
-
-                        	SELECT *
-                        	FROM entries
-				WHERE entry_number = (
-					SELECT MAX(entry_number)
-					FROM entries
-					);"
+                                );"
 
 		else
 	
 			echo "	UPDATE entries
                         	SET entry = CONCAT('$3')
-                        	WHERE (entry_number = "$2");
-
-                        	SELECT *
-                        	FROM entries
-				WHERE (entry_number = "$2");"
+                        	WHERE (entry_number = "$2");"
 
 		fi
 	# Delete Branch
@@ -87,18 +69,12 @@ function sql() {
                         	WHERE entry_number = (
                                 	SELECT MAX(entry_number)
                                 	FROM entries
-                                	);
-
-                        	SELECT *
-                        	FROM entries;"
+                                	);"
 
 		else
 
 			echo "DELETE FROM entries
-                        	WHERE entry_number IN ("$2");
-
-                        	SELECT *
-                        	FROM entries;"
+                        	WHERE entry_number IN ("$2");"
 		
 		fi
 	fi
