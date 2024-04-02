@@ -3,39 +3,69 @@
 
 function execute_mysql() {
 	# Determines whether the client is being run inside or outside the container, then:
-	# Enters the DBMS, submits the query, and returns the data to a file "output_dirty."
+	# Enters the DBMS, submits the query, and returns the data to a variable "output".
 	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
-		output=$(mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1" | grep -v '^[-]*$')
+		output_dirty=$(mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1")
+		mysql_err="$?"
 	else
-		output=$(docker-compose exec mysql_blog_interface mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1" | grep -v '^[-]*$')
+		output_dirty=$(docker-compose exec mysql_blog_interface mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$1")
+		mysql_err=$(docker-compose exec mysql_blog_interface echo "$?")
 	fi
-	echo -e "$output"
+
+	output="$(clean_output "$output_dirty")"
+	echo -e "$mysql_err $output"
 }
 
 
 function sql() {
 	# Read Branch
 	if [ "$1" == "read" ]; then
-		if [ "$2" == "all" ]; then
+		# Entry only, no timestamps. This is used for edit prep.
+		if [ "$3" == "clean" ]; then
+			if [ "$2" == "all" ]; then
 			
-			echo "	SELECT *
-         			FROM entries;"
+				echo "	SELECT entry
+         				FROM entries;"
 
-		elif [ "$2" == "last" ]; then
+			elif [ "$2" == "last" ]; then
 			
-			echo "	SELECT *
-                        	FROM entries
-                        	WHERE entry_number = (
-                                	SELECT MAX(entry_number)
-                                	FROM entries
-                                );"
+				echo "	SELECT entry
+                        		FROM entries
+                        		WHERE entry_number = (
+                                		SELECT MAX(entry_number)
+                                		FROM entries
+                               	 	);"
 		
-		else
+			else
 			
-			echo "	SELECT *
-                        	FROM entries
-                        	WHERE entry_number IN ("$2");"
+				echo "	SELECT entry
+                        		FROM entries
+                        		WHERE entry_number IN ("$2");"
 	
+			fi
+		# Entry Number, Timestamp, and Entry. This is used most of the time.
+		else
+			if [ "$2" == "all" ]; then
+
+                                echo "  SELECT *
+                                        FROM entries;"
+
+                        elif [ "$2" == "last" ]; then
+
+                                echo "  SELECT *
+                                        FROM entries
+                                        WHERE entry_number = (
+                                                SELECT MAX(entry_number)
+                                                FROM entries
+                                        );"
+
+                        else
+
+                                echo "  SELECT *
+                                        FROM entries
+                                        WHERE entry_number IN ("$2");"
+
+                        fi
 		fi
 	# Write Branch
 	elif [ "$1" == "write" ]; then 
@@ -84,13 +114,14 @@ function sql() {
 
 function prep_entry() {
 	# Moves the entry to a variable to be formatted.
-	entry=$(<"$1")
+	entry="$(<"$1")"
 
-	# Formats the entry such that it won't conflict with 
-	# SQL commands and can be reversed upon retrieval.
-	entry_pass_one=$(echo "$entry" | sed -i "s/'/', CHAR(39), '/g")
-	entry_pass_two=$(echo "$entry_pass_one" | sed -i "s/\"/', CHAR(34), '/g")
-	entry_pass_three=$(echo "$entry_pass_two" | sed -i "s/;/', CHAR(59), '/g")
+	# Replaces single quotes with MySQL-friendly syntax.
+	entry_pass_one="$(echo -e "$entry" | sed "s/'/', CHAR(39), '/g")"
+	# Replaces double quotes.
+	entry_pass_two="$(echo -e "$entry_pass_one" | sed "s/\"/', CHAR(34), '/g")"
+	# Replaces semicolons.
+	entry_pass_three="$(echo -e "$entry_pass_two" | sed "s/;/', CHAR(59), '/g")"
 
 	# Returns formatted text.
 	echo -e "$entry_pass_three"
@@ -98,17 +129,22 @@ function prep_entry() {
 
 
 function clean_output() {
+
         output_dirty="$1"
 	
-	# Reverse engineers some of the escape sequences that MySQL outputs.
-	output_pass_one=$(echo -e "$output_dirty" | sed -i 's/\\t/\t/g')
-	output_pass_two=$(echo -e "$output_pass_one" | sed -i 's/\\n/\n/g')
+	# Removes some cluttery output from the MySQL output.
+	output_pass_one="$(echo -e "$output_dirty" | grep -v '^[-]*$')"
+	# Puts tabs back into the formatting.
+	output_pass_two="$(echo -e "$output_pass_one" | sed 's/\\t/\t/g')"
+	# Puts newlines back into the formatting."
+	output_pass_three="$(echo -e "$output_pass_two" | sed 's/\\n/\n/g')"
+	# Handles different output fields to make things more visibly pleasant.
+	output_pass_four="$(echo -e "$output_pass_three" | sed 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')"
+	# Removes the header naming the fields outputted by MySQL.
+	output_pass_five="$(echo -e "$output_pass_four" | sed '1d')"
 
-	# Additional formatting to make things more digestable in a lightweight text editor.
-	output_pass_three=$(echo -e "$output_pass_two" | sed -i 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')
-
-	# Moves the output to a long-term file once it's formatted.
-        echo -e "$output_pass_three"
+	# Return the formatted output.
+        echo -e "$output_pass_five"
 } 
 
 
@@ -128,32 +164,27 @@ function blog_read() {
                 read_nums="$1"
         fi
 
-	# Gets our query based on user input/args and executes.
+	# Gets our query based on user input/args and executes, stores output and mysql exit code.
         action=$(sql "read" "$read_nums" 2>/dev/null) 
-        execute_mysql "$action"
+	output_and_err=$(execute_mysql "$action")
+	mysql_err="${output_and_err%% *}"
+	output="${output_and_err#* }"
 	
 	# Determines success and reports. Shows user their result if possible.
-        if [ $? -eq 0 ]; then
-                echo "Read successful."
-		clean_output
-		show_output
-		cleanup
+        if [ "$mysql_err" == 0 ]; then
+		echo "$(show_output "$output")"
                 exit 0
         else
-		clean_output
-		if [ "$(<output)" == "" ]; then
-			if [ $(echo "$read_nums" | grep -oE '[0-9]+' | wc -l) -eq 1 ]; then
-                		echo "That entry doesn't exist."
-	                	cleanup	
+		if [ "$output" == "" ]; then
+			if [ "$(echo "$read_nums" | grep -oE '[0-9]+' | wc -l)" -eq 1 ]; then
+                		echo "That entry doesn't exist."	
 				exit 1
 			else
 				echo "Those entries don't exist."
-				cleanup
 				exit 1
 			fi
 		else
                		echo "Something went wrong."
-                	cleanup
 			exit 1
 		fi
         fi
@@ -170,31 +201,29 @@ function blog_write() {
 
 	
 	# Prep entry file by formatting for MySQL, determine SQL to be used, and execute.
+	# Stores MySQL exit code and cleaned output.
         ENTRY_FILE=$(prep_entry "$file_name")
         action=$(sql "write" "$ENTRY_FILE")
-	
-        execute_mysql "$action" 
+	output_and_err=$(execute_mysql "$action")
+        mysql_err="${output_and_err%% *}"
+        output="${output_and_err#* }"
 
 
 	# Report results to the user, show a finalized version of their write if requested.
-        if [ $? -eq 0 ]; then
+        if [ "$mysql_err" ==  0 ]; then
                 echo "Write successful."
 
                 echo "Read last entry?: (Y/N)"
                 read read_ans
 
                 if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
-			clean_output
-                        show_output
-                        cleanup
+			echo -e "$(blog read "last")"
 			exit 0
                 else
-                        cleanup
 			exit 0
                 fi
         else
                 echo "Something went wrong."
-                cleanup
 		exit 1
         fi
 }
@@ -217,9 +246,16 @@ function blog_edit() {
                 file_name="$2"
         fi
 
-	# Prep entry file by formatting for MySQL and determine SQL to be used.
-        ENTRY_FILE=$(prep_entry "$file_name")
-	action=$(sql "edit" "$edit_num" "$ENTRY_FILE")
+	# Retrieves entry for editing.
+	action=$(sql "read" "$edit_num" "clean" 2>/dev/null)
+        output_and_err=$(execute_mysql "$action")
+        mysql_err="${output_and_err%% *}"
+        output="${output_and_err#* }"
+
+
+	# Allows the user to edit the entry.
+	echo "$output" > entry
+	vim entry
 
 	# Warns the user.
         echo "Are you sure you want to permanently overwrite this entry? (Y/N)"
@@ -227,9 +263,16 @@ function blog_edit() {
 
 	# Executes the SQL in the DBMS, report results to user, display all entries if requested.
         if [ $edit_ans == "Y" ] || [ $edit_ans == "y" ]; then
-                execute_mysql "$action"
-                if [ $? -eq 0 ]; then
-			if [ "$(<output_dirty)" != "" ]; then
+         	
+	 	 # Prep entry file by formatting for MySQL and determine SQL to be used.
+        	ENTRY_FILE=$(prep_entry "$file_name")
+        	action=$(sql "edit" "$edit_num" "$ENTRY_FILE")	
+		output_and_err=$(execute_mysql "$action")
+        	mysql_err="${output_and_err%% *}"
+        	output="${output_and_err#* }"
+
+                if [ "$mysql_err" == "0" ]; then
+			if [ "$output" != "" ]; then
 				echo "Edit successful."
 			else
 				echo "That entry dooesn't exist."
@@ -238,22 +281,17 @@ function blog_edit() {
                         read read_ans
 
                         if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
-				clean_output
-                                show_output
-                                cleanup
+				echo -e "$(blog read "$edit_num")"
 				exit 0
                         else
-                                cleanup
 				exit 0
                         fi
                 else
                         echo "Something went wrong. Nothing has been overwritten."
-                        cleanup
 			exit 1
                 fi
-        elsei
+        else
                 echo "Nothing has been overwritten."
-                cleanup
 		exit 0
         fi
 }
