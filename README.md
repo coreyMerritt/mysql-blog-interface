@@ -59,10 +59,10 @@ docker-compose exec mysql_blog_interface bash
 blog read
 ```
 ```bash 
-blog read 5
+blog read 2
 ```
 ```bash
-blog read "13, 19, 6"
+blog read "4, 5, 3"
 ```
 ```bash
 blog read all
@@ -96,10 +96,10 @@ blog write different_file.txt
 blog edit
 ```
 ```bash
-blog edit 19
+blog edit 5
 ```
 ```bash
-blog edit 19 different_file.txt
+blog edit 5 different_file.txt
 ```
      
 <br></br>
@@ -116,10 +116,10 @@ blog edit 19 different_file.txt
 blog delete
 ```
 ```bash
-blog delete 19
+blog delete 5
 ```
 ```bash
-blog delete "5, 13, 19"
+blog delete "2, 4, 5"
 ```
 ```bash
 blog delete last
