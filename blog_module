@@ -390,20 +390,27 @@ function blog_delete() {
 
 
 function blog_backup() {
+	# Checks for an alternate file name.
+	if [ "$1" != "" ]; then
+		file_name = "$1"
+	else
+		file_name = "backup.sql"
+	fi 
+	
 	# Gets a snapshot of the backup before and after trying to overwrite it.	
-        touch backup.sql
-	BEFORE_DUMP=$(<backup.sql)
+	touch "$file_name"
+	BEFORE_DUMP=$(<"$file_name")
 
 	# Determines whether the client is being run inside or outside the container.
 	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
-        	mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > backup.sql
+        	mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > "$file_name"
 		mysql_err="$?"
 	else
-		docker-compose exec mysql_blog_interface mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > backup.sql
+		docker-compose exec mysql_blog_interface mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > "$file_name"
 		mysql_err="$(docker-compose exec mysql_blog_interface echo "$?")"
 	fi
 
-        AFTER_DUMP=$(<backup.sql)
+        AFTER_DUMP=$(<"$file_name")
 
 	# Checks MySQL exit code & if the snapshots are different to determine success.
         if [ "$BEFORE_DUMP" != "$AFTER_DUMP" ] && [ "$mysql_err" == "0" ]; then
