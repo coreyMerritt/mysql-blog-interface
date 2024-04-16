@@ -391,10 +391,10 @@ function blog_delete() {
 
 function blog_backup() {
 	# Checks for an alternate file name.
-	if [ "$1" != "" ]; then
-		file_name = "$1"
+	if [ "$2" != "" ]; then
+		file_name="$2"
 	else
-		file_name = "backup.sql"
+		file_name="backup.sql"
 	fi 
 	
 	# Gets a snapshot of the backup before and after trying to overwrite it.	
