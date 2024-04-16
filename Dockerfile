@@ -10,11 +10,11 @@ COPY blog_config.yml /usr/local/share/blog_config.yml
 
 COPY blog_config_mysql.cnf /usr/local/share/blog_config_mysql.cnf
 
-COPY backup.sql backup.sql
+COPY init.sql init.sql
 
 COPY startup /usr/local/bin/startup
 
-RUN chmod +rwx /usr/local/bin/blog /usr/local/bin/blog_module backup.sql /usr/local/bin/startup
+RUN chmod +rwx /usr/local/bin/blog /usr/local/bin/blog_module init.sql /usr/local/bin/startup
 
 RUN apt-get update
 	
