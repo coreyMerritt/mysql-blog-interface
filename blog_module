@@ -438,3 +438,9 @@ function local_publish() {
 		exit 1
         fi
 }
+
+
+# A help function for the user to get their bearings.
+function blog_help() {
+	echo -e "The following actions are available:\n\tblog read\n\tblog write\n\tblog edit\n\tblog delete\n\tblog backup"
+}
