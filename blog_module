@@ -148,26 +148,21 @@ function clean_output() {
 
 
 function blog_read() {
-	
-	action=$1
-
 	# Asks the user what they want to read if it wasn't specified in args.
-        if [ "$2" == "" ]; then
+        if [ "$entry_number" == "" ]; then
                 echo -e "Which entries would you like to read?\n\tex) 5\n\tex) 2, 4, 5\n\tex) last\n\tex) all"
-                read read_nums
-        else
-                read_nums="$2"
+                read entry_number
         fi
 
 	# Gets our query based on user input/args and executes, stores output and mysql exit code.
-        mysql_action=$(sql "$action" "$read_nums" "$3") 
+        mysql_action=$(sql "$action" "$entry_number" "$style") 
 	output_and_err=$(execute_mysql "$mysql_action")
 	mysql_err="${output_and_err%% *}"
 	output="${output_and_err#* }"
 	
 	# Determines success and reports. Shows user their result if possible.
         if [ "$mysql_err" == 0 ]; then
-		if [ "$3" == "clean" ]; then
+		if [ "$style" == "clean" ]; then
                        	echo -e "$output"
             	else
                 	echo " "
@@ -177,7 +172,7 @@ function blog_read() {
                 exit 0
         else
 		if [ "$output" == "" ]; then
-			if [ "$(echo "$read_nums" | grep -oE '[0-9]+' | wc -l)" -eq 1 ]; then
+			if [ "$(echo "$entry_number" | grep -oE '[0-9]+' | wc -l)" -eq 1 ]; then
                 		echo "That entry doesn't exist."	
 				exit 1
 			else
@@ -193,20 +188,12 @@ function blog_read() {
 
 
 function blog_write() {
-	
-	action=$1
-	
 	# If file was specified in args, we use that. If not, we use "entry."
-        if [ "$2" == "" ]; then
-
+        if [ "$file_name" == "" ]; then
                 file_name="./entry"
-
 		# Prompts user to write their entry.
                 truncate -s 0 "$file_name"
                 vim +"set wrap linebreak" -c "startinsert" "$file_name"
-
-        else
-                file_name="$2"
         fi
 		
 	echo "Are you sure you want to submit this entry? (Y/N)"
@@ -239,7 +226,7 @@ function blog_write() {
 
                 	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
 				echo " "
-				echo -e "$(blog read "last")"
+				echo -e "$(blog read -e last)"
 				echo " "
 				exit 0
                 	else
@@ -251,35 +238,25 @@ function blog_write() {
 
 
 function blog_edit() {
-	
-	action=$1
-
 	# Asks the user what they want to edit if it wasn't specified in args.
-        if [ "$2" == "" ]; then
+        if [ "$entry_number" == "" ]; then
                 echo -e "Which entry would you like to overwrite?\n\tex) 5\n\tex)last"
-                read edit_num
-        else
-                edit_num="$2"
+                read entry_number
         fi
 
 
 	# If file was specified in args, we use that. If not, we use "entry."
-        if [ "$3" == "" ]; then
+        if [ "$file_name" == "" ]; then
                 file_name="./entry"
-        else
-                file_name="$3"
         fi
 
 	# Retrieves entry for editing.
-	output=$(blog read "$edit_num" "clean")
+	output=$(blog read -e "$entry_number" -s "clean")
 
 	if [ "$output" == "" ]; then
-
 		echo "That entry doesn't exist."
 		exit 1
-
 	else
-
 		# Allows the user to edit the entry.
 		echo "$output" > "$file_name"
 		vim +"set wrap linebreak" -c "startinsert" "$file_name"
@@ -289,22 +266,18 @@ function blog_edit() {
         	read edit_ans
 
 		# Executes the SQL in the DBMS, report results to user, display all entries if requested.
-        	if [ $edit_ans != "Y" ] && [ $edit_ans != "y" ]; then
-         	
+        	if [ "$edit_ans" != "Y" ] && [ "$edit_ans" != "y" ]; then
 			echo "Nothing has been overwritten."
                         exit 0
-
 		else
-
 	 		# Prep entry file by formatting for MySQL and determine SQL to be used.
-        		ENTRY_FILE=$(prep_entry "$file_name")
-        		mysql_action=$(sql "$action" "$edit_num" "$ENTRY_FILE")	
-			output_and_err=$(execute_mysql "$mysql_action")
+        		ENTRY_FILE="$(prep_entry "$file_name")"
+        		mysql_action="$(sql "$action" "$entry_number" "$ENTRY_FILE")"
+			output_and_err="$(execute_mysql "$mysql_action")"
         		mysql_err="${output_and_err%% *}"
         		output="${output_and_err#* }"
 
                		if [ "$mysql_err" != "0" ]; then
-
 				echo "Something went wrong. Nothing has been overwritten."
                                 exit 1
 			else
@@ -313,7 +286,7 @@ function blog_edit() {
 
                         	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
 					echo " "
-					echo -e "$(blog read "$edit_num")"
+					echo -e "$(blog read -e "$entry_number")"
 					echo " "
 					exit 0
                         	else
@@ -326,32 +299,26 @@ function blog_edit() {
 
 
 function blog_delete() {
-	
-	action=$1
-
 	# Asks the user what they want to edit if it wasn't specified in args.
-        if [ "$2" == "" ]; then
+        if [ "$entry_number" == "" ]; then
                 echo -e "Which entries would you like to delete?\n\tex) 5\n\tex) 2, 4, 5\n\tex) last"
-                read del_nums
-        else
-                del_nums="$2"
+                read entry_number
         fi
 
 	# Checks if the entry exists, informs user, and performs a plural check.
-	output="$(blog read "$del_nums")"
+	output="$(blog read -e "$entry_number")"
 	if [[ ! "$output" =~ [^[:space:]] ]]; then	# Looks for anything except white space.
-		if [ $(echo "$del_nums" | grep -oE '[0-9]+' | wc -l) -eq 1 ]; then
+		if [ $(echo "$entry_number" | grep -oE '[0-9]+' | wc -l) -eq 1 ]; then
                 	echo "That entry doesn't exist."
        		else
                 	echo "Those entries don't exist."
 		fi
 	else
-		
 		# Determines SQL to be used.
-        	mysql_action=$(sql "$action" "$del_nums" 2>/dev/null)
+        	mysql_action=$(sql "$action" "$entry_number" 2>/dev/null)
   
 		# Warns the user. Singular/plural check.
-		if [ $(echo "$del_nums" | grep -oE '[0-9]+' | wc -l) -le 1 ]; then
+		if [ $(echo "$entry_number" | grep -oE '[0-9]+' | wc -l) -le 1 ]; then
 			echo "Are you sure you want to permanently delete that entry? (Y/N)"
 		else        
 			echo "Are you sure you want to permanently delete those entries? (Y/N)"
@@ -362,7 +329,7 @@ function blog_delete() {
 		# the option to view all entries to confirm.
         	if [ $del_ans == "Y" ] || [ $del_ans == "y" ]; then
                 
-			mysql_action=$(sql "$action" "$del_nums" "$ENTRY_FILE")
+			mysql_action=$(sql "$action" "$entry_number" "$ENTRY_FILE")
 			output_and_err=$(execute_mysql "$mysql_action")
                		mysql_err="${output_and_err%% *}"
 
@@ -371,7 +338,7 @@ function blog_delete() {
                         	echo "Read all entries? (Y/N)"
                         	read read_ans
                         	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
-					echo "$(blog read all)"
+					echo "$(blog read -e all)"
 					exit 0
                         	else
 					exit 0
@@ -391,9 +358,7 @@ function blog_delete() {
 
 function blog_backup() {
 	# Checks for an alternate file name.
-	if [ "$2" != "" ]; then
-		file_name="$2"
-	else
+	if [ "$file_name" == "" ]; then
 		file_name="backup.sql"
 	fi 
 	

@@ -2,25 +2,67 @@
 
 source "/usr/local/bin/blog_module"
 
-# Checks if entered action is valid, if not returns a helpful error.
-if [ $# -eq 0 ]; then
-	echo -e "An argument is mandatory, please run \"blog help\" for more info."
-	exit 1
-elif [ $1 == "read" ]; then
-	blog_read "$1" "$2" "$3"
-elif [ $1 == "write" ]; then
-	blog_write "$1" "$2" "$3"
-elif [ $1 == "edit" ]; then
-	blog_edit "$1" "$2" "$3"
-elif [ $1 == "delete" ]; then
-	blog_delete "$1" "$2" "$3"
-elif [ $1 == "backup" ]; then
-	blog_backup "$1" "$2" "$3"
-elif [ $1 == "publish" ]; then
-	local_publish "$1" "$2" "$3"
-elif [ $1 == "help" ]; then
-	blog_help "$1" "$2" "$3"
-else
-	echo -e "You've entered an invalid argument, please run \"blog help\" for more info."
+action=""
+entry_number=""
+file_name=""
+style=""
+
+# Takes in action and options as variables. 
+if [ $# -gt 0 ]; then
+        action="$1"
+        shift
+else 
+	blog_help
 	exit 1
 fi
+
+while getopts 'f:e:a:s:' OPT; do
+        case "$OPT" in
+                f)
+                        file_name="$OPTARG"
+                        ;;
+                e)
+                        entry_number="$OPTARG"
+                        ;;
+		s)
+			style="$OPTARG"
+			;;
+                h)
+                        blog_help
+                        ;;
+		?)
+			blog_help
+			exit 1
+			;;
+        esac
+done
+shift "$((OPTIND -1))"
+
+# Checks if entered action is valid, if not returns a helpful error.
+case "$action" in
+	read)
+		blog_read
+		;;
+	write)
+		blog_write
+		;;
+	edit)
+		blog_edit
+		;;
+	delete)
+		blog_delete
+		;;
+	backup)
+		blog_backup
+		;;
+	publish)
+		local_publish
+		;;
+	help)
+		blog_help
+		;;
+	?)
+		echo -e "You've entered an invalid argument. Run \"blog help\" for more info."
+		exit 1
+		;;
+esac
