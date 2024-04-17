@@ -151,7 +151,7 @@ function clean_output() {
 
 
 function blog_read() {
-	# Asks the user what they want to read if it wasn't specified in args.
+	# Asks the user what they want to read if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
                 echo -e "Which entries would you like to read?\n\tex) 5\n\tex) 2, 4, 5\n\tex) last\n\tex) all"
                 read entry_number
@@ -191,7 +191,7 @@ function blog_read() {
 
 
 function blog_write() {
-	# If file was specified in args, we use that. If not, we use "entry."
+	# If file was specified in option, we use that. If not, we use "entry."
         if [ "$file_name" == "" ]; then
                 file_name="./entry"
 		# Prompts user to write their entry.
@@ -241,14 +241,14 @@ function blog_write() {
 
 
 function blog_edit() {
-	# Asks the user what they want to edit if it wasn't specified in args.
+	# Asks the user what they want to edit if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
                 echo -e "Which entry would you like to overwrite?\n\tex) 5\n\tex)last"
                 read entry_number
         fi
 
 
-	# If file was specified in args, we use that. If not, we use "entry."
+	# If file was specified in options, we use that. If not, we use "entry."
         if [ "$file_name" == "" ]; then
                 file_name="./entry"
         fi
@@ -302,7 +302,7 @@ function blog_edit() {
 
 
 function blog_delete() {
-	# Asks the user what they want to edit if it wasn't specified in args.
+	# Asks the user what they want to edit if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
                 echo -e "Which entries would you like to delete?\n\tex) 5\n\tex) 2, 4, 5\n\tex) last"
                 read entry_number
@@ -407,5 +407,7 @@ function local_publish() {
 
 # A help function for the user to get their bearings.
 function blog_help() {
-	echo -e "The following actions are available:\n\tblog read\n\tblog write\n\tblog edit\n\tblog delete\n\tblog backup"
+	echo -e "Actions:\n\tread\n\twrite\n\tedit\n\tdelete\n\tbackup\n\thelp\n"
+	echo -e "Options:\n\t[-e entry_number]\n\t[-f file_name]\n"
+	echo -e "Examples:\n\tblog read -e all\n\tblog write -f prewritten_entry.txt\n\tblog edit -e 6 -f file_to_work_in.txt\n\tblog delete -e last"
 }
