@@ -3,25 +3,26 @@
 
 function execute_mysql() {
 	
-	database_name="blog_entries"
-	container_name="mysql_blog_interface"
-	mysql_config_path="/usr/local/share/blog_config_mysql.cnf"
-	inContainer="$(read_mysql_cnf Container)"
+	DATABASE_NAME="blog_entries"
+	CONTAINER_NAME="mysql_blog_interface"
+	MYSQL_CONFIG_PATH="/usr/local/share/blog_config_mysql.cnf"
+	BLOG_CONFIG_PATH="/usr/local/share/blog_config.yml"
+	in_container="$(read_mysql_cnf Container)"
 	sql="$1"
 
 	# Determines whether the client is being run inside or outside the container, then:
 	# Enters the DBMS, submits the query, and places the data in "output".
-	case "$inContainer" in
+	case "$in_container" in
 		True)
-			output_dirty=$(mysql --defaults-extra-file="$mysql_config_path" -D "$database_name" -e "$sql")
+			output_dirty=$(mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
 			mysql_err="$?"
 			;;
 		False)
-			output_dirty=$(docker-compose exec "$container_name" mysql --defaults-extra-file="$mysql_config_path" -D "$database_name" -e "$sql")
-			mysql_err=$(docker-compose exec "$container_name" echo "$?")
+			output_dirty=$(docker-compose exec "$CONTAINER_NAME" mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
+			mysql_err=$(docker-compose exec "$CONTAINER_NAME" echo "$?")
 			;;
 		?)
-			echo "You must have a \"Container=True/False\" value in /usr/local/share/blog_config.yml"
+			echo "You must have a \"Container=True/False\" configuration in "$BLOG_CONFIG_PATH""
 			exit 1
 			;;
 	esac
