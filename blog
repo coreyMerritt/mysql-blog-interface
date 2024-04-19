@@ -61,6 +61,9 @@ case "$action" in
 	help)
 		blog_help
 		;;
+	debug)
+		debug
+		;;
 	?)
 		echo -e "You've entered an invalid argument. Run \"blog help\" for more info."
 		exit 1
