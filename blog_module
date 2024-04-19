@@ -3,15 +3,23 @@
 
 function execute_mysql() {
 	sql="$1"
+	inContainer="$(read_mysql_cnf Container)"
 	# Determines whether the client is being run inside or outside the container, then:
 	# Enters the DBMS, submits the query, and places the data in "output".
-	if [ $(grep "Container: " /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
-		output_dirty=$(mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$sql")
-		mysql_err="$?"
-	else
-		output_dirty=$(docker-compose exec mysql_blog_interface mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$sql")
-		mysql_err=$(docker-compose exec mysql_blog_interface echo "$?")
-	fi
+	case "$inContainer" in
+		True)
+			output_dirty=$(mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$sql")
+			mysql_err="$?"
+			;;
+		False)
+			output_dirty=$(docker-compose exec mysql_blog_interface mysql --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf -D blog_entries -e "$sql")
+			mysql_err=$(docker-compose exec mysql_blog_interface echo "$?")
+			;;
+		?)
+			echo "You must have a \"Container=True/False\" value in /usr/local/share/blog_config.yml"
+			exit 1
+			;;
+	esac
 
 	# Returns cleaned output and the MySQL exit code.
 	output="$(clean_output "$output_dirty")"
@@ -149,6 +157,20 @@ function clean_output() {
         echo "$output_pass_three"
 } 
 
+
+function read_mysql_cnf() {
+	setting_check="$1: "
+	if [ $(grep "$setting_check" /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
+		echo "True"
+	else
+		echo "False"
+	fi
+}
+
+
+function debug() {
+	execute_mysql
+}
 
 function blog_read() {
 	# Asks the user what they want to read if it wasn't specified in options.
