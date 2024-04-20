@@ -90,12 +90,10 @@ function blog_write() {
                 vim +"set wrap linebreak" -c "startinsert" "$file_name"
         fi
 		
-	echo "Are you sure you want to submit this entry? (Y/N)"
+	echo "Are you sure you want to submit this entry? (y/N)"
 	read write_ans
 
-	if [ "$write_ans" != "Y" ] && [ "$write_ans" != "y" ]; then
-		echo "Nothing was submitted."
-	else
+	if [ "$write_ans" == "Y" ] && [ "$write_ans" == "y" ]; then
 	 	# Prep entry file by formatting for MySQL, clean up file, and determine SQL to be used.
         	ENTRY_FILE=$(prep_entry "$file_name")
 		rm "$file_name"
@@ -109,13 +107,11 @@ function blog_write() {
 
 		# Report results to the user, show a finalized version of their write if requested.
         	if [ "$mysql_err" !=  0 ]; then
-	
 			echo "Something went wrong."
                 	exit 1
-
 		else
                 	echo "Write successful."
-                	echo "Read last entry?: (Y/N)"
+                	echo "Read last entry?: (y/N)"
                 	read read_ans
 
                 	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
@@ -124,6 +120,8 @@ function blog_write() {
 				echo " "
                 	fi
         	fi
+	else
+		echo "Nothing was submitted."
 	fi
 }
 
@@ -153,7 +151,7 @@ function blog_edit() {
 		vim +"set wrap linebreak" -c "startinsert" "$file_name"
 
 		# Warns the user.
-        	echo "Are you sure you want to permanently overwrite this entry? (Y/N)"
+        	echo "Are you sure you want to permanently overwrite this entry? (y/N)"
         	read edit_ans
 
 		# Executes the SQL in the DBMS, report results to user, display all entries if requested.
@@ -172,7 +170,7 @@ function blog_edit() {
 				echo "Something went wrong. Nothing has been overwritten."
                                 exit 1
 			else
-                       		echo "Read your edited entry? (Y/N)"
+                       		echo "Read your edited entry? (y/N)"
                         	read read_ans
 
                         	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
@@ -204,9 +202,9 @@ function blog_delete() {
 	else
 		# Warns the user. Singular/plural check.
 		if [ $(echo "$entry_number" | grep -oE '[0-9]+' | wc -l) -le 1 ]; then
-			echo "Are you sure you want to permanently delete that entry? (Y/N)"
+			echo "Are you sure you want to permanently delete that entry? (y/N)"
 		else        
-			echo "Are you sure you want to permanently delete those entries? (Y/N)"
+			echo "Are you sure you want to permanently delete those entries? (y/N)"
 		fi
         	read del_ans
 
