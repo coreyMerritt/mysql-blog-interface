@@ -6,6 +6,7 @@ function main() {
         cp blog_core /usr/local/bin/blog_core
 	cp blog_sql /usr/local/bin/blog_sql
 	cp startup /usr/local/bin/startup
+	chmod +x /usr/local/bin/blog /usr/local/bin/blog_core /usr/local/bin/blog_sql /usr/local/bin/startup
 
 	# Report results to user.
         if [ $? -eq 0 ]; then
