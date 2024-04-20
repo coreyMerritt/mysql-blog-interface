@@ -1,6 +1,7 @@
 #!/bin/bash
 
-source "/usr/local/bin/blog_module"
+source "/usr/local/bin/blog_core"
+source "/usr/local/bin/blog_sql"
 
 action=""
 entry_number=""

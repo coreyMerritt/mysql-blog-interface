@@ -1,134 +1,5 @@
 #!/bin/bash
 
-function execute_mysql() {
-	
-	DATABASE_NAME="blog_entries"
-	CONTAINER_NAME="mysql_blog_interface"
-	MYSQL_CONFIG_PATH="/usr/local/share/blog_config_mysql.cnf"
-	BLOG_CONFIG_PATH="/usr/local/share/blog_config.yml"
-	in_container="$(read_mysql_cnf Container)"
-	sql="$1"
-
-	# Determines whether the client is being run inside or outside the container, then:
-	# Enters the DBMS, submits the query, and places the data in "output".
-	case "$in_container" in
-		True)
-			output_dirty=$(mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
-			mysql_err="$?"
-			;;
-		False)
-			output_dirty=$(docker-compose exec "$CONTAINER_NAME" mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
-			mysql_err=$(docker-compose exec "$CONTAINER_NAME" echo "$?")
-			;;
-		?)
-			echo "You must have a \"Container: [True] | [False]\" configuration in "$BLOG_CONFIG_PATH""
-			exit 1
-			;;
-	esac
-
-	# Returns cleaned output and the MySQL exit code.
-	output="$(clean_output "$output_dirty")"
-	echo -e "$mysql_err $output"
-}
-
-
-function sql() {
-	entry="$1"
-	# Read Branch
-	if [ "$action" == "read" ]; then
-		# Entry only, no timestamps. This is used for edit prep.
-		if [ "$style" == "clean" ]; then
-			if [ "$entry_number" == "all" ]; then
-			
-				echo "	SELECT entry
-         				FROM entries;"
-
-			elif [ "$entry_number" == "last" ]; then
-			
-				echo "	SELECT entry
-                        		FROM entries
-                        		WHERE entry_number = (
-                                		SELECT MAX(entry_number)
-                                		FROM entries
-                               	 	);"
-		
-			else
-			
-				echo "	SELECT entry
-                        		FROM entries
-                        		WHERE entry_number IN ("$entry_number");"
-	
-			fi
-		# Entry Number, Timestamp, and Entry. This is used most of the time.
-		else
-			if [ "$entry_number" == "all" ]; then
-
-                                echo "  SELECT *
-                                        FROM entries;"
-
-                        elif [ "$entry_number" == "last" ]; then
-
-                                echo "  SELECT *
-                                        FROM entries
-                                        WHERE entry_number = (
-                                                SELECT MAX(entry_number)
-                                                FROM entries
-                                        );"
-
-                        else
-
-                                echo "  SELECT *
-                                        FROM entries
-                                        WHERE entry_number IN ("$entry_number");"
-
-                        fi
-		fi
-	# Write Branch
-	elif [ "$action" == "write" ]; then 
-
-		echo "	INSERT INTO entries (entry) VALUES (
-                		CONCAT('"$entry"')
-                	);"
-	
-	# Edit Branch
-	elif [ "$action" == "edit" ]; then
-		
-		if [ "$entry_number" == "last" ]; then
-	
-			echo "	UPDATE entries
-                        	SET entry = CONCAT('$entry')
-                       	 	WHERE entry_number = (
-                                	SELECT MAX(entry_number)
-                                	FROM (SELECT * FROM entries) AS temp
-                                );"
-
-		else
-	
-			echo "	UPDATE entries
-                        	SET entry = CONCAT('$entry')
-                        	WHERE (entry_number = "$entry_number");"
-
-		fi
-	# Delete Branch
-	elif [ "$action" == "delete" ]; then
-		if [ "$entry_number" == "last" ]; then
-
-			echo "	DELETE FROM entries
-                        	WHERE entry_number = (                                                                                                          
-					SELECT MAX(entry_number)                                                                                                
-					FROM (SELECT * FROM entries) AS temp                                                                           
-					);"
-
-		else
-
-			echo "	DELETE FROM entries
-                        	WHERE entry_number IN ("$entry_number");"
-		
-		fi
-	fi
-}
-
-
 function prep_entry() {
 	# Moves the entry to a variable to be formatted.
 	entry="$(<"$1")"
@@ -416,8 +287,9 @@ function blog_backup() {
 # This function was built to help facilitate development.
 function local_publish() {
 	# Moves necessary files to a $PATH directory for ease of access.
-        cp blog_module /usr/local/bin/blog_module
         cp blog /usr/local/bin/blog
+        cp blog_core /usr/local/bin/blog_core
+	cp blog_sql /usr/local/bin/blog_sql
 
 	# Report results to user.
         if [ "$?" -eq 0 ]; then
