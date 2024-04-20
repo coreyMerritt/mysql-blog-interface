@@ -70,7 +70,6 @@ function blog_read() {
 			echo -e "$(echo "$output" | fold -s -w $(tput cols))"
                    	echo " "
           	fi
-                exit 0
         else
 		if [ "$output" == "" ]; then
 			if [ "$(echo "$entry_number" | grep -oE '[0-9]+' | wc -l)" -eq 1 ]; then
@@ -102,7 +101,6 @@ function blog_write() {
 
 	if [ "$write_ans" != "Y" ] && [ "$write_ans" != "y" ]; then
 		echo "Nothing was submitted."
-		exit 0
 	else
 	 	# Prep entry file by formatting for MySQL, determine SQL to be used.
         	ENTRY_FILE=$(prep_entry "$file_name")
@@ -129,9 +127,6 @@ function blog_write() {
 				echo " "
 				echo -e "$(blog read -e last)"
 				echo " "
-				exit 0
-                	else
-				exit 0
                 	fi
         	fi
 	fi
@@ -169,7 +164,6 @@ function blog_edit() {
 		# Executes the SQL in the DBMS, report results to user, display all entries if requested.
         	if [ "$edit_ans" != "Y" ] && [ "$edit_ans" != "y" ]; then
 			echo "Nothing has been overwritten."
-                        exit 0
 		else
 	 		# Prep entry file by formatting for MySQL and determine SQL to be used.
         		ENTRY_FILE="$(prep_entry "$file_name")"
@@ -189,9 +183,6 @@ function blog_edit() {
 					echo " "
 					echo -e "$(blog read -e "$entry_number")"
 					echo " "
-					exit 0
-                        	else
-					exit 0
                         	fi
                 	fi
 		fi
@@ -237,9 +228,6 @@ function blog_delete() {
                         	read read_ans
                         	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
 					echo "$(blog read -e all)"
-					exit 0
-                        	else
-					exit 0
                         	fi
                 	else
                         	echo "Something went wrong. Nothing has been deleted."
@@ -247,7 +235,6 @@ function blog_delete() {
                 	fi
         	else
                 	echo "Nothing has been deleted."
-			exit 0
 		fi
         fi
 }
@@ -278,7 +265,6 @@ function blog_backup() {
 	# Checks MySQL exit code & if the snapshots are different to determine success.
         if [ "$BEFORE_DUMP" != "$AFTER_DUMP" ] && [ "$mysql_err" == "0" ]; then
                 echo "Backup successful."
-		exit 0
         else
                 echo "Something went wrong. Your backup was not updated."
 		exit 1
@@ -296,7 +282,6 @@ function local_publish() {
 	# Report results to user.
         if [ "$?" -eq 0 ]; then
                 echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\n\tblog ..."
-		exit 0
         else
                 echo "Something went wrong."
 		exit 1
