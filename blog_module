@@ -132,34 +132,32 @@ function sql() {
 function prep_entry() {
 	# Moves the entry to a variable to be formatted.
 	entry="$(<"$1")"
-
 	# Replaces single quotes with MySQL-friendly syntax.
-	entry_pass_one="$(echo "$entry" | sed "s/'/', CHAR(39), '/g")"
+	entry="$(echo "$entry" | sed "s/'/', CHAR(39), '/g")"
 	# Replaces double quotes.
-	entry_pass_two="$(echo "$entry_pass_one" | sed "s/\"/', CHAR(34), '/g")"
+	entry="$(echo "$entry" | sed "s/\"/', CHAR(34), '/g")"
 	# Replaces semicolons.
-	entry_pass_three="$(echo "$entry_pass_two" | sed "s/;/', CHAR(59), '/g")"
+	entry="$(echo "$entry" | sed "s/;/', CHAR(59), '/g")"
 	# Replaces newlines.
-	entry_pass_four="$(echo "$entry_pass_three" | sed ":a;N;$!ba;s/\n/', CHAR(10), '/g")"
+	entry="$(echo "$entry" | sed ":a;N;$!ba;s/\n/', CHAR(10), '/g")"
 
 	# Returns formatted text.
-	echo "$entry_pass_four"
+	echo "$entry"
 }
 
 
 function clean_output() {
 
-        output_dirty="$1"	
-
+        output="$1"	
 	# Removes some cluttery output from the MySQL output.
-	output_pass_one="$(echo "$output_dirty" | grep -v '^[-]*$')"
+	output="$(echo "$output" | grep -v '^[-]*$')"
 	# Handles different output fields to make things more visibly pleasant.
-	output_pass_two="$(echo "$output_pass_one" | sed 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')"
+	output="$(echo "$output" | sed 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')"
 	# Removes the header displaying the fields outputted by MySQL.
-	output_pass_three="$(echo "$output_pass_two" | sed '1d')"
+	output="$(echo "$output" | sed '1d')"
 
 	# Return the formatted output.
-        echo "$output_pass_three"
+        echo "$output"
 } 
 
 
