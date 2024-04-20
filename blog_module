@@ -6,7 +6,7 @@ function execute_mysql() {
 	CONTAINER_NAME="mysql_blog_interface"
 	MYSQL_CONFIG_PATH="/usr/local/share/blog_config_mysql.cnf"
 	BLOG_CONFIG_PATH="/usr/local/share/blog_config.yml"
-	in_container="$(read_mysql_cnf Container)"
+	in_container="$(read_config Container)"
 	sql="$1"
 
 	# Determines whether the client is being run inside or outside the container, then:
@@ -163,13 +163,13 @@ function clean_output() {
 } 
 
 
-function read_mysql_cnf() {
-	setting_check="$1: "
-	if [ $(grep "$setting_check" /usr/local/share/blog_config.yml | sed 's/Container: //; s/ *$//') == "True" ]; then
-		echo "True"
-	else
-		echo "False"
-	fi
+function read_config() {
+	CONFIG_PATH="/usr/local/share/blog_config.yml"
+        config_check="$1"
+        config_line=$(echo "$(<"$CONFIG_PATH")" | sed -n "/$config_check:\s/p")
+        config_setting=$(echo "$config_line" | sed -r "s/$config_check:\s//g")
+
+        echo "$config_setting"
 }
 
 
