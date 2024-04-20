@@ -6,7 +6,7 @@ function execute_mysql() {
 	CONTAINER_NAME="mysql_blog_interface"
 	MYSQL_CONFIG_PATH="/usr/local/share/blog_config_mysql.cnf"
 	BLOG_CONFIG_PATH="/usr/local/share/blog_config.yml"
-	in_container="$(read_mysql_cnf Container)"
+	in_container="$(read_config Container)"
 	sql="$1"
 
 	# Determines whether the client is being run inside or outside the container, then:
@@ -32,93 +32,97 @@ function execute_mysql() {
 }
 
 
-function sql() {
+function sql_read() {
+	case "$style" in
+            	# Entry only, no timestamps. This is used for edit prep.
+               	clean)
+                    	case "$entry_number" in
+                           	all)
+                                     	echo "  SELECT entry
+                                            	FROM entries;"
+                                     	;;
+                           	last)
+                                   	echo "  SELECT entry
+                                              	FROM entries
+                                             	WHERE entry_number = (
+                                                  	SELECT MAX(entry_number)
+                                                      	FROM entries
+                                           	);"
+                                      	;;
+                           	""|?)
+                                    	echo "  SELECT entry
+                                            	FROM entries
+                                            	WHERE entry_number IN ("$entry_number");"
+                                       	;;
+
+                 	esac
+                    	;;
+     		# Entry Number, Timestamp, and Entry. This is used most of the time.
+             	""|?)
+                   	case "$entry_number" in
+                            	all)
+                                  	echo "  SELECT *
+                                           	FROM entries;"
+                                     	;;
+                           	last)
+                                     	echo "  SELECT *
+                                           	FROM entries
+                                            	WHERE entry_number = (
+                                                    	SELECT MAX(entry_number)
+                                                       	FROM entries
+                                           	);"
+                                    	;;
+                            	""|?)
+                                    	echo "  SELECT *
+                                             	FROM entries
+                                            	WHERE entry_number IN ("$entry_number");"
+                                    	;;
+               		esac
+                        ;;
+       	esac
+}
+
+
+function sql_write() {
 	entry="$1"
-	
-	case "$action" in
-		# Read Branch
-		read)
-		case "$style" in
-			# Entry only, no timestamps. This is used for edit prep.
-			clean)
-			case "$entry_number" in
-				all)
-					echo "	SELECT entry
-         					FROM entries;"
-				''
-				last)
-					echo "	SELECT entry
-                        			FROM entries
-                        			WHERE entry_number = (
-                                			SELECT MAX(entry_number)
-                                			FROM entries
-                               	 		);"
-				''
-				?)
-					echo "	SELECT entry
-                        			FROM entries
-                        			WHERE entry_number IN ("$entry_number");"
-				''
-			''
-			# Entry Number, Timestamp, and Entry. This is used most of the time.
-			?)
-			case "$entry_number" in
-				all)
-                               		echo "  SELECT *
-                                        	FROM entries;"
-				''
-				last)
-                                	echo "  SELECT *
-                                        	FROM entries
-                                      	 	WHERE entry_number = (
-                                                	SELECT MAX(entry_number)
-                                                	FROM entries
-                                        	);"
-				''
-                      		?)
-                               		echo "  SELECT *
-                                        	FROM entries
-                                        	WHERE entry_number IN ("$entry_number");"
-				''
-			''
-		''
-		# Write Branch
-		write) 
-			echo "	INSERT INTO entries (entry) VALUES (
-                		CONCAT('"$entry"')
-                		);"
-		''
-	
-		# Edit Branch
-		edit)
-		case "$entry_number" in
-			last)
-				echo "	UPDATE entries
-                        		SET entry = CONCAT('$entry')
-                       	 		WHERE entry_number = (
-                                		SELECT MAX(entry_number)
-                                		FROM (SELECT * FROM entries) AS temp
-                                	);"
-			''
-			?)
-				echo "	UPDATE entries
-                        		SET entry = CONCAT('$entry')
-                        		WHERE (entry_number = "$entry_number");"
-			''
-		''
-		# Delete Branch
-		delete)
-		case "$entry_number" in
-			last)
-				echo "	DELETE FROM entries
-                        		WHERE entry_number = (                                                                                                          
-						SELECT MAX(entry_number)                                                                                                
-						FROM (SELECT * FROM entries) AS temp                                                                           
-					);"
-			''
-			?)
-			echo "	DELETE FROM entries
-                        	WHERE entry_number IN ("$entry_number");"
-			''
-		''
+	echo "  INSERT INTO entries (entry) VALUES (
+                CONCAT('"$entry"')
+               	);"
+}
+
+
+function sql_edit() {
+	entry="$1"
+	case "$entry_number" in
+        	last)
+                  	echo "  UPDATE entries
+                    		SET entry = CONCAT('$entry')
+                               	WHERE entry_number = (
+                             		SELECT MAX(entry_number)
+                                   	FROM (SELECT * FROM entries) AS temp
+                            	);"
+                   	;;
+            	""|?)
+                  	echo "  UPDATE entries
+                           	SET entry = CONCAT('$entry')
+                            	WHERE (entry_number = "$entry_number");"
+                      	;;
+    	esac
+}
+
+
+function sql_delete() {
+	case "$entry_number" in
+        	last)
+                  	echo "  DELETE FROM entries
+                              	WHERE entry_number = (
+                                   	SELECT MAX(entry_number)
+                                   	FROM (SELECT * FROM entries) AS temp
+                            	);"
+                    	;;
+              	""|?)
+                  	echo "  DELETE FROM entries
+                      		WHERE entry_number IN ("$entry_number");"
+                       	;;
+    	esac
 }
