@@ -45,7 +45,11 @@ function read_config() {
 function blog_read() {	
 	# Asks the user what they want to read if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
-                echo -e "Which entries would you like to read?\n\tex) 5\n\tex) 2, 4, 5\n\tex) last\n\tex) all"
+                echo -e "Which entries would you like to read?"
+		echo -e "\tex) 5"
+		echo -e "\tex) 2, 4, 5"
+		echo -e "\tex) last"
+		echo -e "\tex) all"
                 read entry_number
         fi
 
@@ -129,7 +133,9 @@ function blog_write() {
 function blog_edit() {
 	# Asks the user what they want to edit if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
-                echo -e "Which entry would you like to overwrite?\n\tex) 5\n\tex)last"
+                echo -e "Which entry would you like to overwrite?"
+		echo -e "\tex) 5"
+		echo -e "\tex)last"
                 read entry_number
         fi
 
@@ -187,7 +193,10 @@ function blog_edit() {
 function blog_delete() {
 	# Asks the user what they want to edit if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
-                echo -e "Which entries would you like to delete?\n\tex) 5\n\tex) 2, 4, 5\n\tex) last"
+                echo -e "Which entries would you like to delete?"
+		echo -e "\tex) 5"
+		echo -e "\tex) 2, 4, 5"
+		echo e- "\tex) last"
                 read entry_number
         fi
 
@@ -218,7 +227,7 @@ function blog_delete() {
 
                 	if [ "$mysql_err" == "0" ]; then
 				echo "Deletion successful."
-                        	echo "Read all entries? (Y/N)"
+                        	echo "Read all entries? (y/N)"
                         	read read_ans
                         	if [ "$read_ans" == "Y" ] || [ "$read_ans" == "y" ]; then
 					echo "$(blog read -e all)"
@@ -275,7 +284,9 @@ function local_publish() {
 
 	# Report results to user.
         if [ "$?" -eq 0 ]; then
-                echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\n\tblog ..."
+                echo -e "Publish to /usr/local/bin successful."
+		echo -e "You may now run commands using:"
+		echo "\tblog ..."
         else
                 echo "Something went wrong."
 		exit 1
@@ -285,7 +296,19 @@ function local_publish() {
 
 # A help function for the user to get their bearings.
 function blog_help() {
-	echo -e "Actions:\n\tread\n\twrite\n\tedit\n\tdelete\n\tbackup\n\thelp\n"
-	echo -e "Options:\n\t[-e entry_number]\n\t[-f file_name]\n"
-	echo -e "Examples:\n\tblog read -e all\n\tblog write -f prewritten_entry.txt\n\tblog edit -e 6 -f file_to_work_in.txt\n\tblog delete -e last"
+	echo -e "Actions:"
+	echo -e "\tread"
+	echo -e "\twrite"
+	echo -e "\tedit"
+	echo -e "\tdelete"
+	echo -e "\tbackup"
+	echo -e "\thelp\n"
+	echo -e "Options:"
+	echo -e "\t[-e entry_number]"
+	echo -e "\t[-f file_name]\n"
+	echo -e "Examples:"
+	echo -e "\tblog read -e all"
+	echo -e "\tblog write -f prewritten_entry.txt"
+	echo -e "\tblog edit -e 6 -f file_to_work_in.txt"
+	echo -e "\tblog delete -e last"
 }
