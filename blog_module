@@ -1,6 +1,5 @@
 #!/bin/bash
 
-
 function execute_mysql() {
 	
 	DATABASE_NAME="blog_entries"
@@ -22,7 +21,7 @@ function execute_mysql() {
 			mysql_err=$(docker-compose exec "$CONTAINER_NAME" echo "$?")
 			;;
 		?)
-			echo "You must have a \"Container=True/False\" configuration in "$BLOG_CONFIG_PATH""
+			echo "You must have a \"Container: [True] | [False]\" configuration in "$BLOG_CONFIG_PATH""
 			exit 1
 			;;
 	esac
