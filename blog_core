@@ -42,12 +42,6 @@ function read_config() {
 }
 
 
-function debug() {
-	code="	SELECT entry 
-		FROM entries;"
-	execute_mysql "$code"
-}
-
 function blog_read() {	
 	# Asks the user what they want to read if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
@@ -102,8 +96,9 @@ function blog_write() {
 	if [ "$write_ans" != "Y" ] && [ "$write_ans" != "y" ]; then
 		echo "Nothing was submitted."
 	else
-	 	# Prep entry file by formatting for MySQL, determine SQL to be used.
+	 	# Prep entry file by formatting for MySQL, clean up file, and determine SQL to be used.
         	ENTRY_FILE=$(prep_entry "$file_name")
+		rm "$file_name"
         	mysql_action=$(sql_write "$ENTRY_FILE")
 
 		# Executes --- stores MySQL exit code & cleaned output.
@@ -165,8 +160,9 @@ function blog_edit() {
         	if [ "$edit_ans" != "Y" ] && [ "$edit_ans" != "y" ]; then
 			echo "Nothing has been overwritten."
 		else
-	 		# Prep entry file by formatting for MySQL and determine SQL to be used.
+	 		# Prep entry file by formatting for MySQL, clean up file, and determine SQL to be used.
         		ENTRY_FILE="$(prep_entry "$file_name")"
+			rm "$file_name"
         		mysql_action="$(sql_edit "$ENTRY_FILE")"
 			output_and_err="$(execute_mysql "$mysql_action")"
         		mysql_err="${output_and_err%% *}"
