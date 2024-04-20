@@ -1,5 +1,11 @@
 #!/bin/bash
 
+#
+#
+# This file is used for development purposes only.
+#
+#
+
 function main() {
 	# Moves necessary files to a $PATH directory for ease of access.
         cp blog /usr/local/bin/blog
