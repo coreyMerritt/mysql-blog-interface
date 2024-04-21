@@ -14,15 +14,15 @@ COPY blog_config_mysql.cnf /usr/local/share/blog_config_mysql.cnf
 
 COPY init.sql init.sql
 
-COPY startup /usr/local/bin/startup
-
-RUN chmod +rxw /usr/local/bin/blog /usr/local/bin/blog_core /usr/local/bin/blog_sql init.sql /usr/local/bin/startup
+RUN chmod +rx /usr/local/bin/blog /usr/local/bin/blog_core /usr/local/bin/blog_sql && \
+	chmod +r init.sql
 
 # Installs basic tools.
-RUN apt-get update && \
-	apt-get install -y mysql-server && \
-	apt-get install -y vim && \
-	apt-get	clean 
+RUN apt update && \
+	apt install -y vim && \	
+	apt install -y mysql-server && \
+	usermod -d /var/lib/mysql/ mysql && \
+	apt clean 
 
 # Configures MySQL.
 RUN service mysql start && \
@@ -30,8 +30,7 @@ RUN service mysql start && \
    	mysql -u root -p'resetme123' -e 'CREATE DATABASE IF NOT EXISTS blog_entries' && \
    	mysql -u root -p'resetme123' -D blog_entries < init.sql && \
    	rm init.sql && \
-    	service mysql stop && \
-	usermod -d /var/lib/mysql/ mysql
+    	service mysql stop
 
 # Attach to MySQL daemon.
 CMD ["mysqld", "--defaults-extra-file=/usr/local/share/blog_config_mysql.cnf"]
