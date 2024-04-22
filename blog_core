@@ -42,6 +42,24 @@ function read_config() {
 }
 
 
+function validate_entry() {
+	if [ "$entry_number" == "all" ] || [ "$entry_number" == "last" ]; then
+		# Nothing needs to be done.
+		:
+	elif [[ "$entry_number" =~ ^[0-9]+$ ]]; then 
+		# Nothing needs to be done.
+		:
+	elif [[ "$entry_number" =~ ^([0-9]+,[ ]?)+[0-9]+$ ]]; then
+		# Nothing needs to be done.
+		:
+	else
+		echo "Your entry is invalid."
+		echo "Run: blog help if you're unsure how to proceed."
+		exit 1
+	fi
+}	
+
+
 function blog_read() {	
 	# Asks the user what they want to read if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
@@ -52,6 +70,8 @@ function blog_read() {
 		echo -e "\tex) all"
                 read entry_number
         fi
+
+	validate_entry
 
 	# Gets our query based on user input/args and executes, stores output and mysql exit code.
 	mysql_action=$(sql_read)
