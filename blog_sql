@@ -20,7 +20,7 @@ function execute_mysql() {
 			output_dirty=$(docker-compose exec "$CONTAINER_NAME" mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
 			mysql_err=$(docker-compose exec "$CONTAINER_NAME" echo "$?")
 			;;
-		?)
+		"" | *)
 			echo "You must have a \"Container: [True] | [False]\" configuration in "$BLOG_CONFIG_PATH""
 			exit 1
 			;;
@@ -49,7 +49,7 @@ function sql_read() {
                                                       	FROM entries
                                            	);"
                                       	;;
-                           	""|?)
+                           	"" | *)
                                     	echo "  SELECT entry
                                             	FROM entries
                                             	WHERE entry_number IN ("$entry_number");"
@@ -58,7 +58,7 @@ function sql_read() {
                  	esac
                     	;;
      		# Entry Number, Timestamp, and Entry. This is used most of the time.
-             	""|?)
+             	"" | *)
                    	case "$entry_number" in
                             	all)
                                   	echo "  SELECT *
@@ -72,7 +72,7 @@ function sql_read() {
                                                        	FROM entries
                                            	);"
                                     	;;
-                            	""|?)
+                            	"" | *)
                                     	echo "  SELECT *
                                              	FROM entries
                                             	WHERE entry_number IN ("$entry_number");"
@@ -102,7 +102,7 @@ function sql_edit() {
                                    	FROM (SELECT * FROM entries) AS temp
                             	);"
                    	;;
-            	""|?)
+            	"" | *)
                   	echo "  UPDATE entries
                            	SET entry = CONCAT('$entry')
                             	WHERE (entry_number = "$entry_number");"
@@ -120,7 +120,7 @@ function sql_delete() {
                                    	FROM (SELECT * FROM entries) AS temp
                             	);"
                     	;;
-              	""|?)
+              	"" | *)
                   	echo "  DELETE FROM entries
                       		WHERE entry_number IN ("$entry_number");"
                        	;;
