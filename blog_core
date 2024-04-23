@@ -54,43 +54,108 @@ function validate_entry() {
 		:
 	else
 		echo "Your entry is invalid."
-		echo "Run: blog help if you're unsure how to proceed."
+		echo "   blog help   if you're unsure how to proceed."
 		exit 1
 	fi
 }	
 
 
+function set_entry_number() {
+	seed_function="$1"
+
+	case "$seed_function" in
+		read)
+			echo -e "Which entries would you like to read?"
+        		echo -e "\tex) 5"
+       			echo -e "\tex) 2, 4, 5"
+      			echo -e "\tex) last"
+       			echo -e "\tex) all"
+      			read entry_number
+			;;
+		edit)
+			echo -e "Which entry would you like to overwrite?"
+                	echo -e "\tex) 5"
+                	echo -e "\tex)last"
+                	read entry_number
+			;;
+		delete)
+			echo -e "Which entries would you like to delete?"
+                	echo -e "\tex) 5"
+                	echo -e "\tex) 2, 4, 5"
+               		echo e- "\tex) last"
+                	read entry_number
+			;;
+	esac
+}
+
+
+function execute_sql() {
+
+        DATABASE_NAME="blog_entries"
+        CONTAINER_NAME="mysql_blog_interface"
+        MYSQL_CONFIG_PATH="/usr/local/share/blog_config_mysql.cnf"
+        BLOG_CONFIG_PATH="/usr/local/share/blog_config.yml"
+        in_container="$(read_config Container)"
+        sql="$1"
+
+        # Determines whether the client is being run inside or outside the container, then:
+        # Enters the DBMS, submits the query, and places the data in "output".
+        case "$in_container" in
+                True)
+                        output_dirty=$(mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
+                        mysql_err="$?"
+                        ;;
+                False)
+                        output_dirty=$(docker-compose exec "$CONTAINER_NAME" mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
+                        mysql_err=$(docker-compose exec "$CONTAINER_NAME" echo "$?")
+                        ;;
+                "" | *)
+                        echo "You must have a \"Container: [True] | [False]\" configuration in "$BLOG_CONFIG_PATH""
+                        exit 1
+                        ;;
+        esac
+        # Returns cleaned output and the MySQL exit code.
+        mysql_output=$(clean_output "$output_dirty")	
+}
+
+
+function singular_check() {
+	if [ echo "$(echo "$entry_number" | grep -oE '[0-9]+' | wc -l)" -eq 1 ]; then
+		echo "True"
+	else
+		echo "False"
+	fi
+}
+
+
+function output_to_user() {
+	echo -e "$(echo -e "$mysql_output" | fold -s -w $(tput cols))"
+}
+
+
 function blog_read() {	
 	# Asks the user what they want to read if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
-                echo -e "Which entries would you like to read?"
-		echo -e "\tex) 5"
-		echo -e "\tex) 2, 4, 5"
-		echo -e "\tex) last"
-		echo -e "\tex) all"
-                read entry_number
+ 		set_entry_number "read"               
         fi
 
 	validate_entry
 
 	# Gets our query based on user input/args and executes, stores output and mysql exit code.
-	mysql_action=$(sql_read)
-	output_and_err=$(execute_mysql "$mysql_action")
-	mysql_err="${output_and_err%% *}"
-	output="${output_and_err#* }"
+	mysql_action=$(sql_read "user")
+	execute_sql "$mysql_action"
 	
 	# Determines success and reports. Shows user their result if possible.
         if [ "$mysql_err" == 0 ]; then
-		if [ "$style" == "clean" ]; then
-                       	echo -e "$output"
+		if [ "$output_style" == "system" ]; then
+			# Used to prep entry edits.
+                       	echo -e "$mysql_output"	
             	else
-                	echo " "
-			echo -e "$(echo "$output" | fold -s -w $(tput cols))"
-                   	echo " "
+			output_to_user
           	fi
         else
-		if [ "$output" == "" ]; then
-			if [ "$(echo "$entry_number" | grep -oE '[0-9]+' | wc -l)" -eq 1 ]; then
+		if [ "$mysql_output" == "" ]; then
+			if [ singular_check == "True" ]; then
                 		echo "That entry doesn't exist."	
 				exit 1
 			else
@@ -153,10 +218,7 @@ function blog_write() {
 function blog_edit() {
 	# Asks the user what they want to edit if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
-                echo -e "Which entry would you like to overwrite?"
-		echo -e "\tex) 5"
-		echo -e "\tex)last"
-                read entry_number
+                set_entry_number "edit"
         fi
 
 
@@ -166,7 +228,7 @@ function blog_edit() {
         fi
 
 	# Retrieves entry for editing.
-	output=$(blog read -e "$entry_number" -s "clean")
+	output=$(blog read -e "$entry_number" -s "system")
 
 	if [ "$output" == "" ]; then
 		echo "That entry doesn't exist."
@@ -213,11 +275,7 @@ function blog_edit() {
 function blog_delete() {
 	# Asks the user what they want to edit if it wasn't specified in options.
         if [ "$entry_number" == "" ]; then
-                echo -e "Which entries would you like to delete?"
-		echo -e "\tex) 5"
-		echo -e "\tex) 2, 4, 5"
-		echo e- "\tex) last"
-                read entry_number
+                set_entry_number "delete"
         fi
 
 	# Checks if the entry exists, informs user, and performs a plural check.

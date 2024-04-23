@@ -7,6 +7,8 @@ action=""
 entry_number=""
 file_name=""
 style=""
+mysql_err=""
+mysql_output=""
 
 # Takes in action and options as variables. 
 if [ $# -gt 0 ]; then
