@@ -4,7 +4,7 @@ WORKDIR /opt/mysql_blog_interface
 
 COPY blog /usr/local/bin/blog
 
-COPY blog_core /usr/local/bin/blog_core
+COPY blog_module /usr/local/bin/blog_module
 
 COPY blog_sql /usr/local/bin/blog_sql
 
@@ -14,7 +14,7 @@ COPY blog_config_mysql.cnf /usr/local/share/blog_config_mysql.cnf
 
 COPY init.sql init.sql
 
-RUN chmod +rx /usr/local/bin/blog /usr/local/bin/blog_core /usr/local/bin/blog_sql && \
+RUN chmod +rx /usr/local/bin/blog /usr/local/bin/blog_module /usr/local/bin/blog_sql && \
 	chmod +r init.sql
 
 # Installs basic tools.
