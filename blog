@@ -1,47 +1,105 @@
 #!/bin/bash
 
-source "/usr/local/bin/blog_core"
+source "/usr/local/bin/blog_module"
 source "/usr/local/bin/blog_sql"
 
 action=""
 entry_number=""
 file_name=""
-style=""
+style="user"
 mysql_err=""
 mysql_output=""
 
-# Takes in action and options as variables. 
-if [ $# -gt 0 ]; then
-        action="$1"
-        shift
-else 
-	blog_help
-	exit 1
-fi
 
-while getopts 'f:e:a:s:' OPT; do
-        case "$OPT" in
-                f)
-                        file_name="$OPTARG"
-                        ;;
-                e)
-                        entry_number="$OPTARG"
-                        ;;
-		s)
-			style="$OPTARG"
-			;;
-                h)
-                        blog_help
-                        ;;
-		?)
-			blog_help
-			exit 1
-			;;
-        esac
-done
-shift "$((OPTIND -1))"
+#---------------------------------------------------------------------------------------------
+# Core Functionality
+#---------------------------------------------------------------------------------------------
 
-# Checks if entered action is valid, if not returns a helpful error.
+
+function blog_read() {
+	options_check__entry_number
+        validate__entry_number
+
+        read_from_database
+
+        error_check__mysql
+        validate__mysql_output
+
+        display_output
+}
+
+function blog_write() {
+	if [ "$file_name" == "" ]; then
+                options_check__file_name
+                prompt_user__write_entry
+        fi
+
+        prompt_user__confirm_write
+        write_to_database
+
+        error_check__mysql
+        echo "Write successful."
+
+        prompt_user__read_last_entry
+        echo -e "\n$(blog read -e last)\n"
+}
+
+function blog_edit() {
+	options_check__entry_number
+        options_check__file_name
+
+        entry_to_edit=$(blog read -e "$entry_number" -s "system")
+
+        if [ "$entry_to_edit" == "" ]; then
+                echo "That entry doesn't exist."
+                exit 1
+        else
+                prompt_user__edit_entry "$entry_to_edit"
+                prompt_user__confirm_edit
+
+                write_to_database
+
+                error_check__mysql
+
+                prompt_user__confirm_read_edited
+                echo -e "\n$(blog read -e "$entry_number")\n"
+        fi
+}
+
+function blog_delete() {
+	options_check__entry_number
+
+        validate__entry_exists
+
+        prompt_user__confirm_deletion
+        delete_from_database
+
+        error_check__mysql
+        echo "Deletion successful."
+
+        prompt_user__read_all
+        echo "$(blog read -e all)"
+}
+
+function blog_backup() {
+        options_check__file_name "backup.sql"
+
+        touch "$file_name"
+        BEFORE_DUMP=$(<"$file_name")
+        execute_backup
+        AFTER_DUMP=$(<"$file_name")
+
+        error_check__mysql
+        if [ "$BEFORE_DUMP" != "$AFTER_DUMP" ]; then
+                echo "Backup successful."
+        else
+                echo "Something went wrong. Your backup was not updated."
+                exit 1
+        fi
+}
+
+
+function main () {
 case "$action" in
 	read)
 		blog_read
@@ -64,11 +122,48 @@ case "$action" in
 	help)
 		blog_help
 		;;
-	debug)
-		debug
-		;;
-	?)
-		echo -e "You've entered an invalid argument. Run \"blog help\" for more info."
+	"" | *)
+		echo -e "You've entered an invalid action. Run \"blog help\" for more info."
 		exit 1
 		;;
 esac
+}
+
+
+#---------------------------------------------------------------------------------------------
+# Entrypoint
+#---------------------------------------------------------------------------------------------
+
+
+# Takes in an action and options as variables.
+if [ $# -gt 0 ]; then
+        action="$1"
+        shift
+else
+        prompt_user__help
+        exit 1
+fi
+
+while getopts 'f:e:a:s:' OPT; do
+        case "$OPT" in
+                f)
+                        file_name="$OPTARG"
+                        ;;
+                e)
+                        entry_number="$OPTARG"
+                        ;;
+                s)
+                        style="$OPTARG"
+                        ;;
+                h)
+                        prompt_user__help
+                        ;;
+                ?)
+                        prompt_user__help
+                        exit 1
+                        ;;
+        esac
+done
+shift "$((OPTIND -1))"
+
+main

@@ -1,32 +1,25 @@
 #!/bin/bash
 
+function get_sql() {
+	case "$action" in
+		read)
+			sql_read
+			;;
+		write)
+			sql_write $1
+			;;
+		edit)
+			sql_edit $1
+			;;
+		delete)
+			sql_delete
+			;;
+	esac
+}
+
 
 function sql_read() {
-	output_style="$1"
-	case "$output_style" in
-            	# Entry only, no timestamps. This is used for edit prep.
-               	system)
-                    	case "$entry_number" in
-                           	all)
-                                     	echo "  SELECT entry
-                                            	FROM entries;"
-                                     	;;
-                           	last)
-                                   	echo "  SELECT entry
-                                              	FROM entries
-                                             	WHERE entry_number = (
-                                                  	SELECT MAX(entry_number)
-                                                      	FROM entries
-                                           	);"
-                                      	;;
-                           	"" | *)
-                                    	echo "  SELECT entry
-                                            	FROM entries
-                                            	WHERE entry_number IN ("$entry_number");"
-                                       	;;
-
-                 	esac
-                    	;;
+	case "$style" in
      		# Entry Number, Timestamp, and Entry. This is used most of the time.
              	user)
                    	case "$entry_number" in
@@ -48,6 +41,29 @@ function sql_read() {
                                             	WHERE entry_number IN ("$entry_number");"
                                     	;;
                		esac
+                        ;;
+		# Entry only, no timestamps. This is used for edit prep.
+                system)
+                        case "$entry_number" in
+                                all)
+                                        echo "  SELECT entry
+                                                FROM entries;"
+                                        ;;
+                                last)
+                                        echo "  SELECT entry
+                                                FROM entries
+                                                WHERE entry_number = (
+                                                        SELECT MAX(entry_number)
+                                                        FROM entries
+                                                );"
+                                        ;;
+                                "" | *)
+                                        echo "  SELECT entry
+                                                FROM entries
+                                                WHERE entry_number IN ("$entry_number");"
+                                        ;;
+
+                        esac
                         ;;
 		"" | *)
 			:
