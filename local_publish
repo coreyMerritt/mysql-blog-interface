@@ -9,10 +9,9 @@
 function main() {
 	# Moves necessary files to a $PATH directory for ease of access.
         cp blog /usr/local/bin/blog
-        cp blog_core /usr/local/bin/blog_core
+        cp blog_module /usr/local/bin/blog_module
 	cp blog_sql /usr/local/bin/blog_sql
-	cp startup /usr/local/bin/startup
-	chmod +x /usr/local/bin/blog /usr/local/bin/blog_core /usr/local/bin/blog_sql /usr/local/bin/startup
+	chmod +x /usr/local/bin/blog /usr/local/bin/blog_module /usr/local/bin/blog_sql
 
 	# Report results to user.
         if [ $? -eq 0 ]; then
