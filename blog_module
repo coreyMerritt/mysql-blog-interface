@@ -1,0 +1,373 @@
+#!/bin/bash
+
+
+#---------------------------------------------------------------------------------------------
+# Validation
+#---------------------------------------------------------------------------------------------
+
+
+function validate__entry_number() {
+        if [ "$entry_number" == "all" ] || [ "$entry_number" == "last" ]; then
+                # Nothing needs to be done.
+                :
+        elif [[ "$entry_number" =~ ^[0-9]+$ ]]; then
+                # Nothing needs to be done.
+                :
+        elif [[ "$entry_number" =~ ^([0-9]+,[ ]?)+[0-9]+$ ]]; then
+                # Nothing needs to be done.
+                :
+        else
+                echo "Your entry is invalid."
+                echo "   blog help   if you're unsure how to proceed."
+                exit 1
+        fi
+}
+
+function validate__mysql_output() {
+        if [ "$mysql_output" == "" ]; then
+                if [ singular_check__entry_number == "True" ]; then
+                        echo "That entry doesn't exist."
+                        exit 1
+                else
+                        echo "Those entries don't exist."
+                        exit 1
+                fi
+        fi
+}
+
+function validate__entry_exists() {
+        output="$(blog read -e "$entry_number")"
+        if [[ ! "$output" =~ [^[:space:]] ]]; then
+                if [ singular_check__entry_number == "True" ]; then
+                        echo "That entry doesn't exist."
+                        exit 1
+                else
+                        echo "Those entries don't exist."
+                        exit 1
+                fi
+        fi
+}
+
+function options_check__entry_number() {
+        if [ "$entry_number" == "" ]; then
+                user_prompt__set_entry_number
+        fi
+}
+
+function options_check__file_name() {
+        desired_name="$1"
+        if [ "$file_name" == "" ]; then
+                if [ "$desired_name" == "" ]; then
+                        file_name="./entry"
+                else
+                        file_name="$desired_name"
+                fi
+        fi
+}
+
+
+#---------------------------------------------------------------------------------------------
+# Data Formatting
+#---------------------------------------------------------------------------------------------
+
+
+function format_entry() {
+	entry="$(<"$file_name")"
+	entry="$(echo "$entry" | sed "s/'/', CHAR(39), '/g")"
+	entry="$(echo "$entry" | sed "s/\"/', CHAR(34), '/g")"
+	entry="$(echo "$entry" | sed "s/;/', CHAR(59), '/g")"
+	entry="$(echo "$entry" | sed ":a;N;$!ba;s/\n/', CHAR(10), '/g")"
+	
+	rm "$file_name"
+	echo "$entry"
+}
+
+
+function clean_output() {
+        output="$1"	
+	# Removes some cluttery output from the MySQL output.
+	output="$(echo "$output" | grep -v '^[-]*$')"
+	# Handles different output fields to make things more visibly pleasant.
+	output="$(echo "$output" | sed 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')"
+	# Removes the header displaying the fields outputted by MySQL.
+	output="$(echo "$output" | sed '1d')"
+
+        echo "$output"
+}
+
+
+#---------------------------------------------------------------------------------------------
+# Output & Basic Formatting
+#---------------------------------------------------------------------------------------------
+
+
+function output_to_user() {
+        echo " "
+        echo -e "$(echo -e "$mysql_output" | fold -s -w $(tput cols))"
+        echo " "
+}
+
+function display_output() {
+        if [ "$style" == "user" ]; then
+                output_to_user
+        elif [ "$style" == "system" ]; then
+                echo -e "$mysql_output"
+        else
+                echo "Something went wrong."
+                exit 1
+        fi
+}
+ 
+
+#---------------------------------------------------------------------------------------------
+# blog_sql Interfacing
+#---------------------------------------------------------------------------------------------
+
+
+function write_to_database() {
+        formatted_entry=$(format_entry)
+        loaded_sql=$(get_sql "$formatted_entry")
+        execute_sql "$loaded_sql"
+}
+
+function read_from_database() {
+        loaded_sql=$(get_sql)
+        execute_sql "$loaded_sql"
+}
+
+function delete_from_database() {
+        loaded_sql=$(get_sql)
+        execute_sql "$loaded_sql"
+}
+
+
+#---------------------------------------------------------------------------------------------
+# Database Interfacing
+#---------------------------------------------------------------------------------------------
+
+
+function execute_sql() {
+        DATABASE_NAME="blog_entries"
+        CONTAINER_NAME="mysql_blog_interface"
+        MYSQL_CONFIG_PATH="/usr/local/share/blog_config_mysql.cnf"
+        BLOG_CONFIG_PATH="/usr/local/share/blog_config.yml"
+        in_container=$(get_value_from_key "Container")
+        sql="$1"
+
+        # Determines whether the client is being run inside or outside the container, then:
+        # Enters the DBMS, submits the query, and places the data in "output".
+        case "$in_container" in
+                True)
+                        output_dirty=$(mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
+                        mysql_err="$?"
+			;;
+                False)
+                        output_dirty=$(docker-compose exec "$CONTAINER_NAME" mysql --defaults-extra-file="$MYSQL_CONFIG_PATH" -D "$DATABASE_NAME" -e "$sql")
+                        mysql_err=$(docker-compose exec "$CONTAINER_NAME" echo "$?")
+                        ;;
+                "" | *)
+                        echo "You must have a \"Container: [True] | [False]\" configuration in "$BLOG_CONFIG_PATH""
+                        exit 1
+                        ;;
+        esac
+        # Returns cleaned output and the MySQL exit code.
+        mysql_output=$(clean_output "$output_dirty")	
+}
+
+function execute_backup() {
+        DATABASE_NAME="blog_entries"
+        CONTAINER_NAME="mysql_blog_interface"
+        MYSQL_CONFIG_PATH="/usr/local/share/blog_config_mysql.cnf"
+        BLOG_CONFIG_PATH="/usr/local/share/blog_config.yml"
+        in_container=$(get_value_from_key "Container")
+
+        case "$in_container" in
+                True)
+                        mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > "$file_name"
+                        mysql_err="$?"
+                        ;;
+                False)
+                        docker-compose exec mysql_blog_interface mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > "$file_name"
+                        mysql_err="$(docker-compose exec mysql_blog_interface echo "$?")"
+                        ;;
+                "" | *)
+                        echo "You must have a \"Container: [True] | [False]\" configuration in "$BLOG_CONFIG_PATH""
+                        exit 1
+                        ;;
+        esac
+}
+
+
+#---------------------------------------------------------------------------------------------
+# User Prompts
+#---------------------------------------------------------------------------------------------
+
+
+function prompt_user__write_entry() {
+	truncate -s 0 "$file_name"
+        vim +"set wrap linebreak" -c "startinsert" "$file_name"
+}
+
+function prompt_user__read_last_entry() {
+        echo "Read last entry?: (y/N)"
+        read read_ans
+
+        if [ "$read_ans" != "Y" ] && [ "$read_ans" != "y" ]; then
+                exit 0
+        fi
+}
+
+function prompt_user__confirm_write() {
+	echo "Are you sure you want to submit this entry? (y/N)"
+        read write_ans
+	if [ "$write_ans" != "Y" ] && [ "$write_ans" != "y" ]; then
+		echo "Your entry has not been submitted."
+		exit 0
+	fi
+}
+
+function prompt_user__edit_entry() {
+	entry="$1"
+	echo "$entry" > "$file_name"
+        vim +"set wrap linebreak" -c "startinsert" "$file_name"
+}
+
+function prompt_user__confirm_edit() {
+	echo "Are you sure you want to permanently overwrite this entry? (y/N)"
+        read edit_ans
+	if [ "$edit_ans" != "Y" ] && [ "$edit_ans" != "y" ]; then
+      		echo "Nothing has been overwritten."
+		exit 0
+	fi
+}
+
+function prompt_user__confirm_read_edited() {
+	echo "Read your edited entry? (y/N)"
+        read read_ans
+	if [ "$read_ans" != "Y" ] && [ "$read_ans" != "y" ]; then
+		exit 0
+	fi
+}
+
+function prompt_user__confirm_deletion() {
+	if [ singular_check__entry_number == "True" ]; then
+                echo "Are you sure you want to permanently delete that entry? (y/N)"
+        else
+                echo "Are you sure you want to permanently delete those entries? (y/N)"
+        fi
+
+        read del_ans
+
+      	if [ $del_ans != "Y" ] && [ $del_ans != "y" ]; then
+		echo "Nothing was deleted."
+		exit 0
+	fi
+}
+
+function prompt_user__read_all() {
+	echo "Read all entries? (y/N)"
+        read read_ans
+       	if [ "$read_ans" != "Y" ] && [ "$read_ans" != "y" ]; then
+		exit 0
+	fi
+}
+
+function user_prompt__set_entry_number() {
+        case "$action" in
+                read)
+                        echo "Which entries would you like to read?"
+                        echo -e "\tex) 5"
+                        echo -e "\tex) 2, 4, 5"
+                        echo -e "\tex) last"
+                        echo -e "\tex) all"
+                        read entry_number
+                        ;;
+                edit)
+                        echo "Which entry would you like to overwrite?"
+                        echo -e "\tex) 5"
+                        echo -e "\tex)last"
+                        read entry_number
+                        ;;
+                delete)
+                        echo "Which entries would you like to delete?"
+                        echo -e "\tex) 5"
+                        echo -e "\tex) 2, 4, 5"
+                        echo -e "\tex) last"
+                        read entry_number
+                        ;;
+        esac
+}
+
+function prompt_user__help() {
+	echo "Actions:"
+        echo -e "\tread"
+        echo -e "\twrite"
+        echo -e "\tedit"
+        echo -e "\tdelete"
+        echo -e "\tbackup"
+        echo -e "\thelp"
+        echo " "
+        echo "Options:"
+        echo -e "\t[-e entry_number]"
+        echo -e "\t[-f file_name]"
+        echo " "
+        echo "Examples:"
+        echo -e "\tblog read -e all"
+        echo -e "\tblog write -f prewritten_entry.txt"
+        echo -e "\tblog edit -e 6 -f file_to_work_in.txt"
+        echo -e "\tblog delete -e last"
+}
+
+#---------------------------------------------------------------------------------------------
+# Misc.
+#---------------------------------------------------------------------------------------------
+
+
+function error_check__mysql() {
+        if [ "$mysql_err" != 0 ]; then
+                echo "Something went wrong."
+                exit 1
+        fi
+}
+
+
+function singular_check__entry_number() {
+        if [ echo "$(echo "$entry_number" | grep -oE '[0-9]+' | wc -l)" -eq 1 ]; then
+                echo "True"
+        else
+                echo "False"
+        fi
+}
+
+function get_value_from_key() {
+        CONFIG_PATH="/usr/local/share/blog_config.yml"
+        key_to_check="$1"
+        key_line=$(echo "$(<"$CONFIG_PATH")" | sed -n "/$key_to_check:\s/p")
+        value=$(echo "$key_line" | sed -r "s/$key_to_check:\s//g")
+
+        echo "$value"
+}
+
+
+#---------------------------------------------------------------------------------------------
+# Dev Tools
+#---------------------------------------------------------------------------------------------
+
+
+# This function was built to help facilitate development.
+function local_publish() {
+        # Moves necessary files to a $PATH directory for ease of access.
+        cp blog /usr/local/bin/blog
+        cp blog_core /usr/local/bin/blog_core
+        cp blog_sql /usr/local/bin/blog_sql
+
+        # Report results to user.
+        if [ "$?" -eq 0 ]; then
+                echo "Publish to /usr/local/bin successful."
+                echo "You may now run commands using:"
+                echo -e "\tblog ..."
+        else
+                echo "Something went wrong."
+                exit 1
+        fi
+}
