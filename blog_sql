@@ -6,10 +6,10 @@ function get_sql() {
 			sql_read
 			;;
 		write)
-			sql_write $1
+			sql_write "$1"
 			;;
 		edit)
-			sql_edit $1
+			sql_edit "$1"
 			;;
 		delete)
 			sql_delete

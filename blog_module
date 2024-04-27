@@ -50,7 +50,7 @@ function validate__entry_exists() {
 
 function options_check__entry_number() {
         if [ "$entry_number" == "" ]; then
-                user_prompt__set_entry_number
+                prompt_user__set_entry_number
         fi
 }
 
@@ -73,26 +73,26 @@ function options_check__file_name() {
 
 function format_entry() {
 	entry="$(<"$file_name")"
-	entry="$(echo "$entry" | sed "s/'/', CHAR(39), '/g")"
-	entry="$(echo "$entry" | sed "s/\"/', CHAR(34), '/g")"
-	entry="$(echo "$entry" | sed "s/;/', CHAR(59), '/g")"
-	entry="$(echo "$entry" | sed ":a;N;$!ba;s/\n/', CHAR(10), '/g")"
+	entry="$(echo -e "$entry" | sed "s/'/', CHAR(39), '/g")"
+	entry="$(echo -e "$entry" | sed "s/\"/', CHAR(34), '/g")"
+	entry="$(echo -e "$entry" | sed "s/;/', CHAR(59), '/g")"
+	entry="$(echo -e "$entry" | sed ":a;N;$!ba;s/\n/', CHAR(10), '/g")"
 	
 	rm "$file_name"
-	echo "$entry"
+	echo -e "$entry"
 }
 
 
 function clean_output() {
         output="$1"	
 	# Removes some cluttery output from the MySQL output.
-	output="$(echo "$output" | grep -v '^[-]*$')"
+	output="$(echo -e "$output" | grep -v '^[-]*$')"
 	# Handles different output fields to make things more visibly pleasant.
-	output="$(echo "$output" | sed 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')"
+	output="$(echo -e "$output" | sed 's/^\([0-9]\+\s[0-9]\{4\}-[0-9]\{2\}-[0-9]\{2\}\s[0-9]\{2\}:[0-9]\{2\}:[0-9]\{2\}\)/\n\n\n\1\n/g')"
 	# Removes the header displaying the fields outputted by MySQL.
-	output="$(echo "$output" | sed '1d')"
+	output="$(echo -e "$output" | sed '1d')"
 
-        echo "$output"
+        echo -e "$output"
 }
 
 
@@ -126,6 +126,7 @@ function display_output() {
 
 function write_to_database() {
         formatted_entry=$(format_entry)
+	echo "$formatted_entry"
         loaded_sql=$(get_sql "$formatted_entry")
         execute_sql "$loaded_sql"
 }
@@ -153,8 +154,8 @@ function execute_sql() {
         BLOG_CONFIG_PATH="/usr/local/share/blog_config.yml"
         in_container=$(get_value_from_key "Container")
         sql="$1"
-
-        # Determines whether the client is being run inside or outside the container, then:
+        
+	# Determines whether the client is being run inside or outside the container, then:
         # Enters the DBMS, submits the query, and places the data in "output".
         case "$in_container" in
                 True)
@@ -171,7 +172,8 @@ function execute_sql() {
                         ;;
         esac
         # Returns cleaned output and the MySQL exit code.
-        mysql_output=$(clean_output "$output_dirty")	
+        
+	mysql_output=$(clean_output "$output_dirty")	
 }
 
 function execute_backup() {
@@ -183,12 +185,12 @@ function execute_backup() {
 
         case "$in_container" in
                 True)
-                        mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > "$file_name"
+                        mysqldump --defaults-extra-file="$MYSQL_CONFIG_PATH" --default-character-set=utf8 "$DATABASE_NAME" > "$file_name"
                         mysql_err="$?"
                         ;;
                 False)
-                        docker-compose exec mysql_blog_interface mysqldump --defaults-extra-file=/usr/local/share/blog_config_mysql.cnf --default-character-set=utf8 blog_entries > "$file_name"
-                        mysql_err="$(docker-compose exec mysql_blog_interface echo "$?")"
+                        docker-compose exec "$CONTAINER_NAME" mysqldump --defaults-extra-file="$MYSQL_CONFIG_PATH" --default-character-set=utf8 "$DATABASE_NAME" > "$file_name"
+                        mysql_err="$(docker-compose exec "$CONTAINER_NAME" echo "$?")"
                         ;;
                 "" | *)
                         echo "You must have a \"Container: [True] | [False]\" configuration in "$BLOG_CONFIG_PATH""
@@ -272,7 +274,7 @@ function prompt_user__read_all() {
 	fi
 }
 
-function user_prompt__set_entry_number() {
+function prompt_user__set_entry_number() {
         case "$action" in
                 read)
                         echo "Which entries would you like to read?"
@@ -370,4 +372,9 @@ function local_publish() {
                 echo "Something went wrong."
                 exit 1
         fi
+}
+
+function debug() {
+	file_name="./entry"
+	format_entry
 }

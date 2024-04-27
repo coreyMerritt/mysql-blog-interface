@@ -116,11 +116,14 @@ case "$action" in
 	backup)
 		blog_backup
 		;;
+	help)
+                blog_help
+		;;
 	publish)
 		local_publish
 		;;
-	help)
-		blog_help
+	debug)
+		debug
 		;;
 	"" | *)
 		echo -e "You've entered an invalid action. Run \"blog help\" for more info."
