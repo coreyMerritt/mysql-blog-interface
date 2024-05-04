@@ -20,98 +20,98 @@ function get_sql() {
 
 function sql_read() {
 	case "$style" in
-     		# Entry Number, Timestamp, and Entry. This is used most of the time.
-             	user)
-                   	case "$entry_number" in
-                            	all)
-                                  	echo "  SELECT *
-                                           	FROM entries;"
-                                     	;;
-                           	last)
-                                     	echo "  SELECT *
-                                           	FROM entries
-                                            	WHERE entry_number = (
-                                                    	SELECT MAX(entry_number)
-                                                       	FROM entries
-                                           	);"
-                                    	;;
-                            	"" | *)
-                                    	echo "  SELECT *
-                                             	FROM entries
-                                            	WHERE entry_number IN ("$entry_number");"
-                                    	;;
-               		esac
+    	# Entry Number, Timestamp, and Entry. This is used most of the time.
+     	user)
+          	case "$entry_number" in
+            	all)
+                  	echo "  SELECT *
+                         	FROM entries;"
+                           	;;
+            	last)
+                 	echo "  SELECT *
+                         	FROM entries
+                         	WHERE entry_number = (
+                          		SELECT MAX(entry_number)
+                                FROM entries
+                            );"
+                            ;;
+            	"" | *)
+                    echo "  SELECT *
+                        	FROM entries
+                        	WHERE entry_number IN ("$entry_number");"
+                            ;;
+            esac
                         ;;
 		# Entry only, no timestamps. This is used for edit prep.
-                system)
-                        case "$entry_number" in
-                                all)
-                                        echo "  SELECT entry
-                                                FROM entries;"
-                                        ;;
-                                last)
-                                        echo "  SELECT entry
-                                                FROM entries
-                                                WHERE entry_number = (
-                                                        SELECT MAX(entry_number)
-                                                        FROM entries
-                                                );"
-                                        ;;
-                                "" | *)
-                                        echo "  SELECT entry
-                                                FROM entries
-                                                WHERE entry_number IN ("$entry_number");"
-                                        ;;
+        system)
+            case "$entry_number" in
+                all)
+                    echo "  SELECT entry
+                            FROM entries;"
+                            ;;
+                last)
+                    echo "  SELECT entry
+                            FROM entries
+                            WHERE entry_number = (
+                                SELECT MAX(entry_number)
+                                FROM entries
+                            );"
+                            ;;
+                "" | *)
+                    echo "  SELECT entry
+                            FROM entries
+                            WHERE entry_number IN ("$entry_number");"
+                            ;;
 
-                        esac
-                        ;;
+            esac
+            ;;
 		"" | *)
 			:
 			;;
-       	esac
+    esac
 }
 
 
 function sql_write() {
 	entry="$1"
 	echo "  INSERT INTO entries (entry) VALUES (
-                CONCAT('"$entry"')
-               	);"
+            CONCAT('"$entry"')
+            );"
 }
 
 
 function sql_edit() {
 	entry="$1"
 	case "$entry_number" in
-        	last)
-                  	echo "  UPDATE entries
-                    		SET entry = CONCAT('$entry')
-                               	WHERE entry_number = (
-                             		SELECT MAX(entry_number)
-                                   	FROM (SELECT * FROM entries) AS temp
-                            	);"
+        last)
+        	echo "  UPDATE entries
+                    SET entry = CONCAT('$entry')
+                    WHERE entry_number = (
+                        SELECT MAX(entry_number)
+                        FROM (SELECT * FROM entries) AS temp
+                    );"
                    	;;
-            	"" | *)
-                  	echo "  UPDATE entries
-                           	SET entry = CONCAT('$entry')
-                            	WHERE (entry_number = "$entry_number");"
-                      	;;
-    	esac
+        "" | *)
+        	echo "  UPDATE entries
+                    SET entry = CONCAT('$entry')
+                    WHERE (entry_number = "$entry_number");"
+                    ;;
+    esac
 }
 
 
 function sql_delete() {
 	case "$entry_number" in
-        	last)
-                  	echo "  DELETE FROM entries
-                              	WHERE entry_number = (
-                                   	SELECT MAX(entry_number)
-                                   	FROM (SELECT * FROM entries) AS temp
-                            	);"
-                    	;;
-              	"" | *)
-                  	echo "  DELETE FROM entries
-                      		WHERE entry_number IN ("$entry_number");"
-                       	;;
-    	esac
+        last)
+            echo "  DELETE FROM entries
+                  	WHERE entry_number = (
+                    	SELECT MAX(entry_number)
+                        FROM (SELECT * FROM entries) AS temp
+                    );"
+                    ;;
+        "" | *)
+            echo "  DELETE FROM entries
+                    WHERE entry_number IN ("$entry_number");"
+                    ;;
+    esac
 }

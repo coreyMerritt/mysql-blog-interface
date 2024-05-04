@@ -8,19 +8,19 @@
 
 function main() {
 	# Moves necessary files to a $PATH directory for ease of access.
-        cp blog /usr/local/bin/blog
-        cp blog_module /usr/local/bin/blog_module
+    cp blog /usr/local/bin/blog
+    cp blog_module /usr/local/bin/blog_module
 	cp blog_sql /usr/local/bin/blog_sql
 	chmod +x /usr/local/bin/blog /usr/local/bin/blog_module /usr/local/bin/blog_sql
 
 	# Report results to user.
-        if [ $? -eq 0 ]; then
-                echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\n\tblog ..."
-                exit 0
-        else
-                echo "Something went wrong."
-                exit 1
-        fi
+    if [ $? -eq 0 ]; then
+        echo -e "Publish to /usr/local/bin successful.\nYou may now run commands using:\n\tblog ..."
+        exit 0
+    else
+        echo "Something went wrong."
+        exit 1
+    fi
 }
 
 main
